@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 using Mongo.Migration.Documents.Attributes;
 using Mongo.Migration.Documents.Locators;
 using Mongo.Migration.Exceptions;
@@ -41,14 +38,14 @@ namespace Mongo.Migration.Migrations.Document
 
             if (settings.ClientSettings != null)
             {
-                this._client = new MongoClient(settings.ClientSettings);
+                _client = new MongoClient(settings.ClientSettings);
             }
             else
             {
-                this._client = new MongoClient(settings.ConnectionString);
+                _client = new MongoClient(settings.ConnectionString);
             }
 
-            this._databaseName = settings.Database;
+            _databaseName = settings.Database;
         }
 
         public StartUpDocumentMigrationRunner(
@@ -62,15 +59,15 @@ namespace Mongo.Migration.Migrations.Document
                 documentVersionService,
                 migrationRunner)
         {
-            this._client = client;
+            _client = client;
 
             if (settings.ConnectionString == null && settings.Database == null)
             {
                 return;
             }
 
-            this._client = new MongoClient(settings.ConnectionString);
-            this._databaseName = settings.Database;
+            _client = new MongoClient(settings.ConnectionString);
+            _databaseName = settings.Database;
         }
 
         private StartUpDocumentMigrationRunner(
@@ -78,28 +75,28 @@ namespace Mongo.Migration.Migrations.Document
             IDocumentVersionService documentVersionService,
             IDocumentMigrationRunner migrationRunner)
         {
-            this._collectionLocator = collectionLocator;
-            this._documentVersionService = documentVersionService;
-            this._migrationRunner = migrationRunner;
+            _collectionLocator = collectionLocator;
+            _documentVersionService = documentVersionService;
+            _migrationRunner = migrationRunner;
         }
 
         public void RunAll()
         {
-            var locations = this._collectionLocator.GetLocatesOrEmpty();
+            var locations = _collectionLocator.GetLocatesOrEmpty();
 
             foreach (var locate in locations)
             {
                 var information = locate.Value;
                 var type = locate.Key;
-                var databaseName = this.GetDatabaseOrDefault(information);
-                var collectionVersion = this._documentVersionService.GetCollectionVersion(type);
+                var databaseName = GetDatabaseOrDefault(information);
+                var collectionVersion = _documentVersionService.GetCollectionVersion(type);
 
-                var collection = this._client.GetDatabase(databaseName)
+                var collection = _client.GetDatabase(databaseName)
                     .GetCollection<BsonDocument>(information.Collection);
 
                 var bulk = new List<WriteModel<BsonDocument>>();
 
-                var query = this.CreateQueryForRelevantDocuments(type);
+                var query = CreateQueryForRelevantDocuments(type);
 
                 using (var cursor = collection.FindSync(query))
                 {
@@ -108,7 +105,7 @@ namespace Mongo.Migration.Migrations.Document
                         var batch = cursor.Current;
                         foreach (var document in batch)
                         {
-                            this._migrationRunner.Run(type, document, collectionVersion);
+                            _migrationRunner.Run(type, document, collectionVersion);
 
                             var update = new ReplaceOneModel<BsonDocument>(
                                 new BsonDocument { { "_id", document["_id"] } },
@@ -129,22 +126,22 @@ namespace Mongo.Migration.Migrations.Document
 
         private string GetDatabaseOrDefault(CollectionLocationInformation information)
         {
-            if (string.IsNullOrEmpty(this._databaseName) && string.IsNullOrEmpty(information.Database))
+            if (string.IsNullOrEmpty(_databaseName) && string.IsNullOrEmpty(information.Database))
             {
                 throw new NoDatabaseNameFoundException();
             }
 
-            return string.IsNullOrEmpty(information.Database) ? this._databaseName : information.Database;
+            return string.IsNullOrEmpty(information.Database) ? _databaseName : information.Database;
         }
 
         private FilterDefinition<BsonDocument> CreateQueryForRelevantDocuments(
             Type type)
         {
-            var currentVersion = this._documentVersionService.GetCurrentOrLatestMigrationVersion(type);
+            var currentVersion = _documentVersionService.GetCurrentOrLatestMigrationVersion(type);
 
-            var existFilter = Builders<BsonDocument>.Filter.Exists(this._documentVersionService.GetVersionFieldName(), false);
+            var existFilter = Builders<BsonDocument>.Filter.Exists(_documentVersionService.GetVersionFieldName(), false);
             var notEqualFilter = Builders<BsonDocument>.Filter.Ne(
-                this._documentVersionService.GetVersionFieldName(),
+                _documentVersionService.GetVersionFieldName(),
                 currentVersion);
 
             return Builders<BsonDocument>.Filter.Or(existFilter, notEqualFilter);

@@ -1,6 +1,4 @@
-﻿using System;
-
-using Mongo.Migration.Documents.Serializers;
+﻿using Mongo.Migration.Documents.Serializers;
 using Mongo.Migration.Exceptions;
 
 using MongoDB.Bson.Serialization;
@@ -39,18 +37,18 @@ namespace Mongo.Migration.Documents
                 throw new VersionStringToLongException(version);
             }
 
-            this.Major = ParseVersionPart(versionParts[0]);
+            Major = ParseVersionPart(versionParts[0]);
 
-            this.Minor = ParseVersionPart(versionParts[1]);
+            Minor = ParseVersionPart(versionParts[1]);
 
-            this.Revision = ParseVersionPart(versionParts[2]);
+            Revision = ParseVersionPart(versionParts[2]);
         }
 
         public DocumentVersion(int major, int minor, int revision)
         {
-            this.Major = major;
-            this.Minor = minor;
-            this.Revision = revision;
+            Major = major;
+            Minor = minor;
+            Revision = revision;
         }
 
         public static DocumentVersion Default()
@@ -75,12 +73,12 @@ namespace Mongo.Migration.Documents
 
         public override string ToString()
         {
-            return $"{this.Major}.{this.Minor}.{this.Revision}";
+            return $"{Major}.{Minor}.{Revision}";
         }
 
         public int CompareTo(DocumentVersion other)
         {
-            if (this.Equals(other))
+            if (Equals(other))
             {
                 return 0;
             }
@@ -122,7 +120,7 @@ namespace Mongo.Migration.Documents
 
         public bool Equals(DocumentVersion other)
         {
-            return other.Major == this.Major && other.Minor == this.Minor && other.Revision == this.Revision;
+            return other.Major == Major && other.Minor == Minor && other.Revision == Revision;
         }
 
         public override bool Equals(object obj)
@@ -137,16 +135,16 @@ namespace Mongo.Migration.Documents
                 return false;
             }
 
-            return this.Equals((DocumentVersion)obj);
+            return Equals((DocumentVersion)obj);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                int result = this.Major;
-                result = (result * 397) ^ this.Minor;
-                result = (result * 397) ^ this.Revision;
+                int result = Major;
+                result = (result * 397) ^ Minor;
+                result = (result * 397) ^ Revision;
                 return result;
             }
         }

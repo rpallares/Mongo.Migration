@@ -2,7 +2,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Mongo.Migration.Documents.Locators;
 using Mongo.Migration.Documents.Serializers;
-using Mongo.Migration.Migrations.Adapters;
 using Mongo.Migration.Migrations.Database;
 using Mongo.Migration.Migrations.Document;
 using Mongo.Migration.Migrations.Locators;
@@ -24,7 +23,6 @@ namespace Mongo.Migration.Startup.DotNetCore
         {
             services.AddSingleton(settings);
 
-            services.AddSingleton<IContainerProvider, Migrations.Adapters.ServiceProvider>();
             services.AddSingleton(typeof(IMigrationLocator<>), typeof(TypeMigrationDependencyLocator<>));
             services.AddSingleton<IDatabaseTypeMigrationDependencyLocator, DatabaseTypeMigrationDependencyLocator>();
             services.AddSingleton<ICollectionLocator, CollectionLocator>();

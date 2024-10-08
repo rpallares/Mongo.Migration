@@ -1,5 +1,3 @@
-using System;
-
 namespace Mongo.Migration.Documents.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
@@ -9,7 +7,7 @@ namespace Mongo.Migration.Documents.Attributes
 
         public CollectionLocation(string collectionName, string databaseName = null)
         {
-            this.CollectionInformation = new CollectionLocationInformation(databaseName, collectionName);
+            CollectionInformation = new CollectionLocationInformation(databaseName, collectionName);
         }
     }
 }

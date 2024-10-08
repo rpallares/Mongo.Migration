@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Mongo.Migration.Documents.Attributes
+﻿namespace Mongo.Migration.Documents.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class StartUpVersion : Attribute
@@ -9,7 +7,7 @@ namespace Mongo.Migration.Documents.Attributes
 
         public StartUpVersion(string version)
         {
-            this.Version = version;
+            Version = version;
         }
     }
 }

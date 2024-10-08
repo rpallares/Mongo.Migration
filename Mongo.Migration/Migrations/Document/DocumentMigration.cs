@@ -1,6 +1,4 @@
-﻿using System;
-
-using Mongo.Migration.Documents;
+﻿using Mongo.Migration.Documents;
 
 using MongoDB.Bson;
 
@@ -11,7 +9,7 @@ namespace Mongo.Migration.Migrations.Document
     {
         protected DocumentMigration(string version)
         {
-            this.Version = version;
+            Version = version;
         }
 
         public DocumentVersion Version { get; }

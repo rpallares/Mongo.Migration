@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Mongo.Migration.Documents.Locators
 {
     public abstract class AbstractLocator<TReturnType, TTypeIdentifier> : ILocator<TReturnType, TTypeIdentifier>
@@ -12,15 +10,15 @@ namespace Mongo.Migration.Documents.Locators
         {
             get
             {
-                if (this._locatesDictionary == null)
+                if (_locatesDictionary == null)
                 {
-                    this.Locate();
+                    Locate();
                 }
 
-                return this._locatesDictionary;
+                return _locatesDictionary;
             }
 
-            set => this._locatesDictionary = value;
+            set => _locatesDictionary = value;
         }
 
         public abstract TReturnType? GetLocateOrNull(TTypeIdentifier identifier);

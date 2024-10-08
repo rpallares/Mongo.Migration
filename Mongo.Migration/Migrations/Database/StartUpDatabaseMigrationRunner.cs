@@ -1,5 +1,3 @@
-using System.Linq;
-
 using Mongo.Migration.Documents.Attributes;
 using Mongo.Migration.Documents.Locators;
 using Mongo.Migration.Exceptions;
@@ -34,14 +32,14 @@ namespace Mongo.Migration.Migrations.Database
 
             if (settings.ClientSettings != null)
             {
-                this._client = new MongoClient(settings.ClientSettings);
+                _client = new MongoClient(settings.ClientSettings);
             }
             else
             {
-                this._client = new MongoClient(settings.ConnectionString);
+                _client = new MongoClient(settings.ConnectionString);
             }
 
-            this._databaseName = settings.Database;
+            _databaseName = settings.Database;
         }
 
         public StartUpDatabaseMigrationRunner(
@@ -53,41 +51,41 @@ namespace Mongo.Migration.Migrations.Database
                 collectionLocator,
                 migrationRunner)
         {
-            this._client = client;
+            _client = client;
             if (settings.ConnectionString == null && settings.Database == null)
             {
                 return;
             }
 
-            this._client = new MongoClient(settings.ConnectionString);
-            this._databaseName = settings.Database;
+            _client = new MongoClient(settings.ConnectionString);
+            _databaseName = settings.Database;
         }
 
         private StartUpDatabaseMigrationRunner(
             ICollectionLocator collectionLocator,
             IDatabaseMigrationRunner migrationRunner)
         {
-            this._collectionLocator = collectionLocator;
-            this._migrationRunner = migrationRunner;
+            _collectionLocator = collectionLocator;
+            _migrationRunner = migrationRunner;
         }
 
         public void RunAll()
         {
-            var locations = this._collectionLocator.GetLocatesOrEmpty().ToList();
+            var locations = _collectionLocator.GetLocatesOrEmpty().ToList();
             var information = locations.FirstOrDefault().Value;
-            var databaseName = this.GetDatabaseOrDefault(information);
+            var databaseName = GetDatabaseOrDefault(information);
 
-            this._migrationRunner.Run(this._client.GetDatabase(databaseName));
+            _migrationRunner.Run(_client.GetDatabase(databaseName));
         }
 
         private string GetDatabaseOrDefault(CollectionLocationInformation information)
         {
-            if (string.IsNullOrEmpty(this._databaseName) && string.IsNullOrEmpty(information.Database))
+            if (string.IsNullOrEmpty(_databaseName) && string.IsNullOrEmpty(information.Database))
             {
                 throw new NoDatabaseNameFoundException();
             }
 
-            return string.IsNullOrEmpty(information.Database) ? this._databaseName : information.Database;
+            return string.IsNullOrEmpty(information.Database) ? _databaseName : information.Database;
         }
     }
 }

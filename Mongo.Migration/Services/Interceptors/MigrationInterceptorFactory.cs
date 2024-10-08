@@ -1,6 +1,4 @@
-﻿using System;
-
-using Mongo.Migration.Migrations.Document;
+﻿using Mongo.Migration.Migrations.Document;
 
 using MongoDB.Bson.Serialization;
 
@@ -14,14 +12,14 @@ namespace Mongo.Migration.Services.Interceptors
 
         public MigrationInterceptorFactory(IDocumentMigrationRunner migrationRunner, IDocumentVersionService documentVersionService)
         {
-            this._migrationRunner = migrationRunner;
-            this._documentVersionService = documentVersionService;
+            _migrationRunner = migrationRunner;
+            _documentVersionService = documentVersionService;
         }
 
         public IBsonSerializer Create(Type type)
         {
             var genericType = typeof(MigrationInterceptor<>).MakeGenericType(type);
-            var interceptor = Activator.CreateInstance(genericType, this._migrationRunner, this._documentVersionService);
+            var interceptor = Activator.CreateInstance(genericType, _migrationRunner, _documentVersionService);
             return interceptor as IBsonSerializer;
         }
     }

@@ -1,32 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-
+﻿using System.Reflection;
+using Microsoft.Extensions.Logging;
 using Mongo.Migration.Extensions;
-using Mongo.Migration.Migrations.Adapters;
 
 namespace Mongo.Migration.Migrations.Locators
 {
     internal class TypeMigrationDependencyLocator<TMigrationType> : MigrationLocator<TMigrationType>
         where TMigrationType : class, IMigration
     {
-        private readonly IContainerProvider _containerProvider;
+        private readonly IServiceProvider _serviceProvider;
 
-        public TypeMigrationDependencyLocator(IContainerProvider containerProvider)
+        public TypeMigrationDependencyLocator(ILogger<TypeMigrationDependencyLocator<TMigrationType>> logger, IServiceProvider serviceProvider)
+        : base(logger)
         {
-            this._containerProvider = containerProvider;
+            _serviceProvider = serviceProvider;
         }
 
         public override void Locate()
         {
             var migrationTypes =
-                (from assembly in this.Assemblies
+                (from assembly in Assemblies
                  from type in assembly.GetTypes()
                  where typeof(TMigrationType).IsAssignableFrom(type) && !type.IsAbstract
                  select type).Distinct(new TypeComparer());
 
-            this.Migrations = migrationTypes.Select(this.GetMigrationInstance).ToMigrationDictionary();
+            Migrations = migrationTypes.Select(GetMigrationInstance).ToMigrationDictionary();
         }
 
         private TMigrationType GetMigrationInstance(Type type)
@@ -37,8 +34,7 @@ namespace Mongo.Migration.Migrations.Locators
             {
                 object[] args = constructor
                     .GetParameters()
-                    .Select(o => o.ParameterType)
-                    .Select(o => this._containerProvider.GetInstance(o))
+                    .Select(parameterInfo => _serviceProvider.GetService(parameterInfo.ParameterType))
                     .ToArray();
 
                 return Activator.CreateInstance(type, args) as TMigrationType;

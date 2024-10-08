@@ -1,58 +1,56 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-
+﻿using System.Reflection;
+using Microsoft.Extensions.Logging;
 using Mongo.Migration.Documents;
 using Mongo.Migration.Exceptions;
 using Mongo.Migration.Extensions;
-
-using NLog;
 
 namespace Mongo.Migration.Migrations.Locators
 {
     public abstract class MigrationLocator<TMigrationType> : IMigrationLocator<TMigrationType>
         where TMigrationType : class, IMigration
     {
-        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly ILogger<MigrationLocator<TMigrationType>> _logger;
 
         private IEnumerable<Assembly> _assemblies;
 
         private IDictionary<Type, IReadOnlyCollection<TMigrationType>> _migrations;
 
-        protected IEnumerable<Assembly> Assemblies => this._assemblies ??= GetAssemblies();
+        protected MigrationLocator(ILogger<MigrationLocator<TMigrationType>> logger)
+        {
+            _logger = logger;
+        }
+
+        protected IEnumerable<Assembly> Assemblies => _assemblies ??= GetAssemblies();
 
         protected virtual IDictionary<Type, IReadOnlyCollection<TMigrationType>> Migrations
         {
             get
             {
-                if (this._migrations == null)
+                if (_migrations == null)
                 {
-                    this.Locate();
+                    Locate();
                 }
 
-                if (this._migrations.NullOrEmpty())
+                if (_migrations.NullOrEmpty())
                 {
-                    this._logger.Info(new NoMigrationsFoundException());
+                    _logger.LogInformation(new NoMigrationsFoundException(), "No migration found");
                 }
 
-                return this._migrations;
+                return _migrations;
             }
-            set => this._migrations = value;
+            set => _migrations = value;
         }
 
         public IEnumerable<TMigrationType> GetMigrations(Type type)
         {
-            IReadOnlyCollection<TMigrationType> migrations;
-            this.Migrations.TryGetValue(type, out migrations);
+            Migrations.TryGetValue(type, out var migrations);
 
             return migrations ?? Enumerable.Empty<TMigrationType>();
         }
 
         public IEnumerable<TMigrationType> GetMigrationsFromTo(Type type, DocumentVersion version, DocumentVersion otherVersion)
         {
-            var migrations = this.GetMigrations(type);
+            var migrations = GetMigrations(type);
 
             return
                 migrations
@@ -63,7 +61,7 @@ namespace Mongo.Migration.Migrations.Locators
 
         public IEnumerable<TMigrationType> GetMigrationsGt(Type type, DocumentVersion version)
         {
-            var migrations = this.GetMigrations(type);
+            var migrations = GetMigrations(type);
 
             return
                 migrations
@@ -73,7 +71,7 @@ namespace Mongo.Migration.Migrations.Locators
 
         public IEnumerable<TMigrationType> GetMigrationsGtEq(Type type, DocumentVersion version)
         {
-            var migrations = this.GetMigrations(type);
+            var migrations = GetMigrations(type);
 
             return
                 migrations
@@ -83,7 +81,7 @@ namespace Mongo.Migration.Migrations.Locators
 
         public DocumentVersion GetLatestVersion(Type type)
         {
-            var migrations = this.GetMigrations(type);
+            var migrations = GetMigrations(type);
 
             if (migrations == null || !migrations.Any())
             {
@@ -95,7 +93,7 @@ namespace Mongo.Migration.Migrations.Locators
 
         public abstract void Locate();
 
-        private static IEnumerable<Assembly> GetAssemblies()
+        private static IReadOnlyList<Assembly> GetAssemblies()
         {
             var location = AppDomain.CurrentDomain.BaseDirectory;
             var path = Path.GetDirectoryName(location);

@@ -1,5 +1,3 @@
-using System.Linq;
-
 using Mongo.Migration.Documents;
 using Mongo.Migration.Migrations.Database;
 using Mongo.Migration.Migrations.Locators;
@@ -21,20 +19,20 @@ namespace Mongo.Migration.Services
             IDatabaseTypeMigrationDependencyLocator migrationLocator,
             IMongoMigrationSettings mongoMigrationSettings)
         {
-            this._migrationLocator = migrationLocator;
-            this._mongoMigrationSettings = mongoMigrationSettings;
+            _migrationLocator = migrationLocator;
+            _mongoMigrationSettings = mongoMigrationSettings;
         }
 
         public DocumentVersion GetCurrentOrLatestMigrationVersion()
         {
-            return this._mongoMigrationSettings.DatabaseMigrationVersion > DocumentVersion.Empty()
-                       ? this._mongoMigrationSettings.DatabaseMigrationVersion
-                       : this._migrationLocator.GetLatestVersion(typeof(DatabaseMigration));
+            return _mongoMigrationSettings.DatabaseMigrationVersion > DocumentVersion.Empty()
+                       ? _mongoMigrationSettings.DatabaseMigrationVersion
+                       : _migrationLocator.GetLatestVersion(typeof(DatabaseMigration));
         }
 
         public DocumentVersion GetLatestDatabaseVersion(IMongoDatabase db)
         {
-            var migrations = this.GetMigrationsCollection(db).Find(m => true).ToList();
+            var migrations = GetMigrationsCollection(db).Find(m => true).ToList();
             if (migrations == null || !migrations.Any())
             {
                 return DocumentVersion.Default();
@@ -45,7 +43,7 @@ namespace Mongo.Migration.Services
 
         public void Save(IMongoDatabase db, IDatabaseMigration migration)
         {
-            this.GetMigrationsCollection(db).InsertOne(
+            GetMigrationsCollection(db).InsertOne(
                 new MigrationHistory
                 {
                     MigrationId = migration.GetType().ToString(),
@@ -55,7 +53,7 @@ namespace Mongo.Migration.Services
 
         public void Remove(IMongoDatabase db, IDatabaseMigration migration)
         {
-            this.GetMigrationsCollection(db).DeleteOne(Builders<MigrationHistory>.Filter.Eq(mh => mh.MigrationId, migration.GetType().ToString()));
+            GetMigrationsCollection(db).DeleteOne(Builders<MigrationHistory>.Filter.Eq(mh => mh.MigrationId, migration.GetType().ToString()));
         }
 
         private IMongoCollection<MigrationHistory> GetMigrationsCollection(IMongoDatabase db)

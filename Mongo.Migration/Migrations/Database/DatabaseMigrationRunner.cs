@@ -1,13 +1,7 @@
-﻿using System;
-using System.Linq;
-
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-
+﻿using Microsoft.Extensions.Logging;
 using Mongo.Migration.Documents;
 using Mongo.Migration.Migrations.Locators;
 using Mongo.Migration.Services;
-
 using MongoDB.Driver;
 
 namespace Mongo.Migration.Migrations.Database
@@ -24,34 +18,27 @@ namespace Mongo.Migration.Migrations.Database
 
         public DatabaseMigrationRunner(
             IDatabaseTypeMigrationDependencyLocator migrationLocator,
-            IDatabaseVersionService databaseVersionService)
-            : this(migrationLocator, databaseVersionService, NullLoggerFactory.Instance)
-        {
-        }
-
-        private DatabaseMigrationRunner(
-            IDatabaseTypeMigrationDependencyLocator migrationLocator,
             IDatabaseVersionService databaseVersionService,
-            ILoggerFactory loggerFactory)
+            ILogger<DatabaseMigrationRunner> logger)
         {
-            this._migrationLocator = migrationLocator;
-            this._databaseVersionService = databaseVersionService;
-            this._logger = loggerFactory.CreateLogger<DatabaseMigrationRunner>();
+            _migrationLocator = migrationLocator;
+            _databaseVersionService = databaseVersionService;
+            _logger = logger;
         }
 
         public void Run(IMongoDatabase db)
         {
-            this._logger.LogInformation("Database migration started.");
-            var databaseVersion = this._databaseVersionService.GetLatestDatabaseVersion(db);
-            var currentOrLatest = this._databaseVersionService.GetCurrentOrLatestMigrationVersion();
+            _logger.LogInformation("Database migration started.");
+            var databaseVersion = _databaseVersionService.GetLatestDatabaseVersion(db);
+            var currentOrLatest = _databaseVersionService.GetCurrentOrLatestMigrationVersion();
 
             if (databaseVersion == currentOrLatest)
             {
                 return;
             }
 
-            this.MigrateUpOrDown(db, databaseVersion, currentOrLatest);
-            this._logger.LogInformation("Database migration finished.");
+            MigrateUpOrDown(db, databaseVersion, currentOrLatest);
+            _logger.LogInformation("Database migration finished.");
         }
 
         private void MigrateUpOrDown(
@@ -61,32 +48,32 @@ namespace Mongo.Migration.Migrations.Database
         {
             if (databaseVersion > to)
             {
-                this.MigrateDown(db, databaseVersion, to);
+                MigrateDown(db, databaseVersion, to);
                 return;
             }
 
-            this.MigrateUp(db, databaseVersion, to);
+            MigrateUp(db, databaseVersion, to);
         }
 
         private void MigrateUp(IMongoDatabase db, DocumentVersion currentVersion, DocumentVersion toVersion)
         {
-            var migrations = this._migrationLocator.GetMigrationsFromTo(this.DatabaseMigrationType, currentVersion, toVersion).ToList();
+            var migrations = _migrationLocator.GetMigrationsFromTo(DatabaseMigrationType, currentVersion, toVersion).ToList();
 
             foreach (var migration in migrations)
             {
-                this._logger.LogInformation("Database Migration Up: {0}:{1} ", currentVersion.GetType().ToString(), migration.Version);
+                _logger.LogInformation("Database Migration Up: {0}:{1} ", currentVersion.GetType().ToString(), migration.Version);
 
                 migration.Up(db);
-                this._databaseVersionService.Save(db, migration);
+                _databaseVersionService.Save(db, migration);
 
-                this._logger.LogInformation("Database Migration Up finished successful: {0}:{1} ", migration.GetType().ToString(), migration.Version);
+                _logger.LogInformation("Database Migration Up finished successful: {0}:{1} ", migration.GetType().ToString(), migration.Version);
             }
         }
 
         private void MigrateDown(IMongoDatabase db, DocumentVersion currentVersion, DocumentVersion toVersion)
         {
-            var migrations = this._migrationLocator
-                .GetMigrationsGtEq(this.DatabaseMigrationType, toVersion)
+            var migrations = _migrationLocator
+                .GetMigrationsGtEq(DatabaseMigrationType, toVersion)
                 .OrderByDescending(m => m.Version)
                 .ToList();
 
@@ -98,12 +85,12 @@ namespace Mongo.Migration.Migrations.Database
                     break;
                 }
 
-                this._logger.LogInformation("Database Migration Down: {0}:{1} ", migration.GetType().ToString(), migration.Version);
+                _logger.LogInformation("Database Migration Down: {0}:{1} ", migration.GetType().ToString(), migration.Version);
 
                 migration.Down(db);
-                this._databaseVersionService.Remove(db, migration);
+                _databaseVersionService.Remove(db, migration);
 
-                this._logger.LogInformation("Database Migration Down finished successful: {0}:{1} ", migration.GetType().ToString(), migration.Version);
+                _logger.LogInformation("Database Migration Down finished successful: {0}:{1} ", migration.GetType().ToString(), migration.Version);
             }
         }
     }

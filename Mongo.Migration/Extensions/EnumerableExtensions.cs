@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using Mongo.Migration.Exceptions;
+﻿using Mongo.Migration.Exceptions;
 using Mongo.Migration.Migrations;
 
 namespace Mongo.Migration.Extensions

@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 using Mongo.Migration.Documents;
 using Mongo.Migration.Migrations.Document;
 

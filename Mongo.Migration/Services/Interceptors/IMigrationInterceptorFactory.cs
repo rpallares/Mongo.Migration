@@ -1,6 +1,4 @@
-﻿using System;
-
-using MongoDB.Bson.Serialization;
+﻿using MongoDB.Bson.Serialization;
 
 namespace Mongo.Migration.Services.Interceptors
 {
