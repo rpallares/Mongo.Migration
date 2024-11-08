@@ -11,7 +11,7 @@ namespace Mongo.Migration.Services
 {
     internal class DocumentVersionService : IDocumentVersionService
     {
-        private static readonly string VERSION_FIELD_NAME = "Version";
+        private static readonly string VersionFieldName = "Version";
 
         private readonly IMigrationLocator<IDocumentMigration> _migrationLocator;
 
@@ -31,7 +31,7 @@ namespace Mongo.Migration.Services
             _runtimeVersionLocator = runtimeVersionLocator;
             _startUpVersionLocator = startUpVersionLocator;
             _versionFieldName = string.IsNullOrWhiteSpace(mongoMigrationSettings.VersionFieldName)
-                                         ? VERSION_FIELD_NAME
+                                         ? VersionFieldName
                                          : mongoMigrationSettings.VersionFieldName;
         }
 
@@ -54,8 +54,7 @@ namespace Mongo.Migration.Services
 
         public DocumentVersion GetVersionOrDefault(BsonDocument document)
         {
-            BsonValue value;
-            document.TryGetValue(GetVersionFieldName(), out value);
+            document.TryGetValue(GetVersionFieldName(), out BsonValue value);
 
             if (value != null && !value.IsBsonNull)
             {

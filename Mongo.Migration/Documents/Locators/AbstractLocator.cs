@@ -4,7 +4,7 @@ namespace Mongo.Migration.Documents.Locators
         where TReturnType : struct
         where TTypeIdentifier : class
     {
-        private IDictionary<TTypeIdentifier, TReturnType> _locatesDictionary;
+        private IDictionary<TTypeIdentifier, TReturnType>? _locatesDictionary;
 
         protected IDictionary<TTypeIdentifier, TReturnType> LocatesDictionary
         {
@@ -15,7 +15,7 @@ namespace Mongo.Migration.Documents.Locators
                     Locate();
                 }
 
-                return _locatesDictionary;
+                return _locatesDictionary!;
             }
 
             set => _locatesDictionary = value;

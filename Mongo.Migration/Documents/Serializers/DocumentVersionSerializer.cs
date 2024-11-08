@@ -17,7 +17,7 @@ namespace Mongo.Migration.Documents.Serializers
         public override DocumentVersion Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
             var versionString = context.Reader.ReadString();
-            return new DocumentVersion(versionString);
+            return new(versionString);
         }
     }
 }

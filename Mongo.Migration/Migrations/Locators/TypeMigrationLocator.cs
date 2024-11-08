@@ -16,7 +16,11 @@ namespace Mongo.Migration.Migrations.Locators
                  where typeof(IDocumentMigration).IsAssignableFrom(type) && !type.IsAbstract
                  select type).Distinct();
 
-            Migrations = migrationTypes.Select(t => (IDocumentMigration)Activator.CreateInstance(t)).ToMigrationDictionary();
+            Migrations = migrationTypes
+                .Select(t =>
+                    Activator.CreateInstance(t) as IDocumentMigration
+                    ?? throw new InvalidOperationException($"Cannot create {t} document migration"))
+                .ToMigrationDictionary();
         }
     }
 }

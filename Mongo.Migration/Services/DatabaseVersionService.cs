@@ -33,7 +33,7 @@ namespace Mongo.Migration.Services
         public DocumentVersion GetLatestDatabaseVersion(IMongoDatabase db)
         {
             var migrations = GetMigrationsCollection(db).Find(m => true).ToList();
-            if (migrations == null || !migrations.Any())
+            if (migrations == null || migrations.Count <= 0)
             {
                 return DocumentVersion.Default();
             }
@@ -44,7 +44,7 @@ namespace Mongo.Migration.Services
         public void Save(IMongoDatabase db, IDatabaseMigration migration)
         {
             GetMigrationsCollection(db).InsertOne(
-                new MigrationHistory
+                new()
                 {
                     MigrationId = migration.GetType().ToString(),
                     Version = migration.Version
@@ -56,7 +56,7 @@ namespace Mongo.Migration.Services
             GetMigrationsCollection(db).DeleteOne(Builders<MigrationHistory>.Filter.Eq(mh => mh.MigrationId, migration.GetType().ToString()));
         }
 
-        private IMongoCollection<MigrationHistory> GetMigrationsCollection(IMongoDatabase db)
+        private static IMongoCollection<MigrationHistory> GetMigrationsCollection(IMongoDatabase db)
         {
             return db.GetCollection<MigrationHistory>(MigrationsCollectionName);
         }

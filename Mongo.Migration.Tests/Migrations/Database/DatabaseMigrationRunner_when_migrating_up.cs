@@ -17,7 +17,7 @@ namespace Mongo.Migration.Tests.Migrations.Database
         {
             base.OnSetUp(DocumentVersion.Empty());
 
-            _runner = _serviceProvider.GetRequiredService<IDatabaseMigrationRunner>();
+            _runner = Provider.GetRequiredService<IDatabaseMigrationRunner>();
         }
 
         [TearDown]
@@ -30,7 +30,7 @@ namespace Mongo.Migration.Tests.Migrations.Database
         public void When_database_has_no_migrations_Then_all_migrations_are_used()
         {
             // Act
-            _runner.Run(_db);
+            _runner.Run(Db);
 
             // Assert
             var migrations = GetMigrationHistory();
@@ -47,7 +47,7 @@ namespace Mongo.Migration.Tests.Migrations.Database
             InsertMigrations(new DatabaseMigration[] { new TestDatabaseMigration_0_0_1(), new TestDatabaseMigration_0_0_2() });
 
             // Act
-            _runner.Run(_db);
+            _runner.Run(Db);
 
             // Assert
             var migrations = GetMigrationHistory();
@@ -63,7 +63,7 @@ namespace Mongo.Migration.Tests.Migrations.Database
                 new DatabaseMigration[] { new TestDatabaseMigration_0_0_1(), new TestDatabaseMigration_0_0_2(), new TestDatabaseMigration_0_0_3() });
 
             // Act
-            _runner.Run(_db);
+            _runner.Run(Db);
 
             // Assert
             var migrations = GetMigrationHistory();

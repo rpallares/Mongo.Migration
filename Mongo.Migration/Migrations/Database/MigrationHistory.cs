@@ -8,7 +8,7 @@ namespace Mongo.Migration.Migrations.Database
     {
         public ObjectId Id { get; set; }
 
-        public string MigrationId { get; set; }
+        public required string MigrationId { get; set; }
 
         public DocumentVersion Version { get; set; }
     }

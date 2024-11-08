@@ -33,7 +33,7 @@ namespace Mongo.Migration.Tests.Performance
         public void TearDown()
         {
             MongoMigrationClient.Reset();
-            _client = null;
+            _client = null!;
             _runner.Dispose();
         }
 
@@ -41,7 +41,7 @@ namespace Mongo.Migration.Tests.Performance
         public void SetUp()
         {
             _runner = MongoDbRunner.Start();
-            _client = new MongoClient(_runner.ConnectionString);
+            _client = new(_runner.ConnectionString);
         }
 
         [Test]
@@ -67,7 +67,7 @@ namespace Mongo.Migration.Tests.Performance
             InsertMany(DOCUMENT_COUNT, true);
             var swWithMigration = new Stopwatch();
             swWithMigration.Start();
-            ServiceCollection serviceCollection = new ServiceCollection();
+            ServiceCollection serviceCollection = new();
             serviceCollection
                 .AddLogging(l => l.AddProvider(NullLoggerProvider.Instance))
                 .AddSingleton<IMongoClient>(_client)

@@ -25,7 +25,7 @@ namespace Mongo.Migration.Tests.Services.Interceptors
         public void If_type_is_assignable_to_document_Then_interceptor_is_created()
         {
             // Arrange
-            var factory = _serviceProvider.GetRequiredService<IMigrationInterceptorFactory>();
+            var factory = Provider.GetRequiredService<IMigrationInterceptorFactory>();
 
             // Act
             var interceptor = factory.Create(typeof(TestDocumentWithOneMigration));
@@ -38,7 +38,7 @@ namespace Mongo.Migration.Tests.Services.Interceptors
         public void If_type_is_not_assignable_to_document_Then_exception_is_thrown()
         {
             // Arrange
-            var factory = _serviceProvider.GetRequiredService<IMigrationInterceptorFactory>();
+            var factory = Provider.GetRequiredService<IMigrationInterceptorFactory>();
 
             // Act
             Action act = () => factory.Create(typeof(TestClass));
@@ -51,10 +51,10 @@ namespace Mongo.Migration.Tests.Services.Interceptors
         public void If_type_is_null_Then_exception_is_thrown()
         {
             // Arrange
-            var factory = _serviceProvider.GetRequiredService<IMigrationInterceptorFactory>();
+            var factory = Provider.GetRequiredService<IMigrationInterceptorFactory>();
 
             // Act
-            Action act = () => factory.Create(null);
+            Action act = () => factory.Create(null!);
 
             // Assert
             act.Should().ThrowExactly<ArgumentNullException>();

@@ -61,7 +61,7 @@ namespace Mongo.Migration.Services
                 // We have to do this, because there is always a default DocumentVersionSerialzer.
                 // BsonSerializer.LookupSerializer(), does not work.
 
-                _logger.LogError(ex, ex.GetType().ToString());
+                _logger.LogError(ex, "Cannot register {Type} twice", typeof(DocumentVersionSerializer));
             }
         }
     }

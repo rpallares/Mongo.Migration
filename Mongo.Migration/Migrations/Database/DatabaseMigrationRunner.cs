@@ -12,9 +12,9 @@ namespace Mongo.Migration.Migrations.Database
 
         private readonly ILogger _logger;
 
-        private readonly Type DatabaseMigrationType = typeof(DatabaseMigration);
+        private readonly Type _databaseMigrationType = typeof(DatabaseMigration);
 
-        private IDatabaseTypeMigrationDependencyLocator _migrationLocator { get; }
+        private readonly IDatabaseTypeMigrationDependencyLocator _migrationLocator;
 
         public DatabaseMigrationRunner(
             IDatabaseTypeMigrationDependencyLocator migrationLocator,
@@ -57,40 +57,39 @@ namespace Mongo.Migration.Migrations.Database
 
         private void MigrateUp(IMongoDatabase db, DocumentVersion currentVersion, DocumentVersion toVersion)
         {
-            var migrations = _migrationLocator.GetMigrationsFromTo(DatabaseMigrationType, currentVersion, toVersion).ToList();
+            var migrations = _migrationLocator.GetMigrationsFromTo(_databaseMigrationType, currentVersion, toVersion).ToList();
 
             foreach (var migration in migrations)
             {
-                _logger.LogInformation("Database Migration Up: {0}:{1} ", currentVersion.GetType().ToString(), migration.Version);
+                _logger.LogInformation("Database Migration Up: {Type}:{Version} ", currentVersion.GetType(), migration.Version);
 
                 migration.Up(db);
                 _databaseVersionService.Save(db, migration);
 
-                _logger.LogInformation("Database Migration Up finished successful: {0}:{1} ", migration.GetType().ToString(), migration.Version);
+                _logger.LogInformation("Database Migration Up finished successful: {Type}:{Version} ", migration.GetType(), migration.Version);
             }
         }
 
         private void MigrateDown(IMongoDatabase db, DocumentVersion currentVersion, DocumentVersion toVersion)
         {
             var migrations = _migrationLocator
-                .GetMigrationsGtEq(DatabaseMigrationType, toVersion)
+                .GetMigrationsGtEq(_databaseMigrationType, toVersion)
                 .OrderByDescending(m => m.Version)
                 .ToList();
 
-            for (var m = 0; m < migrations.Count; m++)
+            foreach (var migration in migrations)
             {
-                var migration = migrations[m];
                 if (migration.Version == toVersion)
                 {
                     break;
                 }
 
-                _logger.LogInformation("Database Migration Down: {0}:{1} ", migration.GetType().ToString(), migration.Version);
+                _logger.LogInformation("Database Migration Down: {Type}:{Version} ", migration.GetType(), migration.Version);
 
                 migration.Down(db);
                 _databaseVersionService.Remove(db, migration);
 
-                _logger.LogInformation("Database Migration Down finished successful: {0}:{1} ", migration.GetType().ToString(), migration.Version);
+                _logger.LogInformation("Database Migration Down finished successful: {Type}:{Version} ", migration.GetType(), migration.Version);
             }
         }
     }

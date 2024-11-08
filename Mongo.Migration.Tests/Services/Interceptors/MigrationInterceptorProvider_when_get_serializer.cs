@@ -25,7 +25,7 @@ namespace Mongo.Migration.Tests.Services.Interceptors
         public void When_entity_is_document_Then_provide_serializer()
         {
             // Arrange 
-            var provider = _serviceProvider.GetRequiredService<IMigrationInterceptorProvider>();
+            var provider = Provider.GetRequiredService<IMigrationInterceptorProvider>();
 
             // Act
             var serializer = provider.GetSerializer(typeof(TestDocumentWithOneMigration));
@@ -38,7 +38,7 @@ namespace Mongo.Migration.Tests.Services.Interceptors
         public void When_entity_is_not_document_Then_provide_null()
         {
             // Arrange 
-            var provider = _serviceProvider.GetRequiredService<IMigrationInterceptorProvider>();
+            var provider = Provider.GetRequiredService<IMigrationInterceptorProvider>();
 
             // Act
             var serializer = provider.GetSerializer(typeof(TestClass));

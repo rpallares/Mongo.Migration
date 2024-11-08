@@ -20,7 +20,8 @@ namespace Mongo.Migration.Services.Interceptors
         {
             var genericType = typeof(MigrationInterceptor<>).MakeGenericType(type);
             var interceptor = Activator.CreateInstance(genericType, _migrationRunner, _documentVersionService);
-            return interceptor as IBsonSerializer;
+            return interceptor as IBsonSerializer
+                ?? throw new InvalidOperationException($"Cannot create {genericType} interceptor");
         }
     }
 }

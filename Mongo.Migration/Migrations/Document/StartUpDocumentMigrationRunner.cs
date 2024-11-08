@@ -15,7 +15,7 @@ namespace Mongo.Migration.Migrations.Document
 
         private readonly ICollectionLocator _collectionLocator;
 
-        private readonly string _databaseName;
+        private readonly string? _databaseName;
 
         private readonly IDocumentVersionService _documentVersionService;
 

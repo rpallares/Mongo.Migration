@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace Mongo.Migration.Tests.Migrations.Locators
 {
     [TestFixture]
-    public class TypeMigrationLocator_when_locate
+    public class TypeMigrationLocatorWhenLocate
     {
         private TypeMigrationLocator _locator;
 
@@ -25,7 +25,7 @@ namespace Mongo.Migration.Tests.Migrations.Locators
             var result = _locator.GetMigrations(typeof(TestDocumentWithOneMigration));
 
             // Assert
-            result.Count().Should().Be(1);
+            result.Count.Should().Be(1);
         }
 
         [Test]
@@ -35,7 +35,7 @@ namespace Mongo.Migration.Tests.Migrations.Locators
             var result = _locator.GetMigrations(typeof(TestDocumentWithTwoMigration));
 
             // Assert
-            result.Count().Should().Be(2);
+            result.Count.Should().Be(2);
         }
 
         [Test]

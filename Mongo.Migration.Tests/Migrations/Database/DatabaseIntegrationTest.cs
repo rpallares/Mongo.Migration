@@ -15,13 +15,15 @@ namespace Mongo.Migration.Tests.Migrations.Database
     {
         private const string MigrationsCollectionName = "_migrations";
 
-        protected IMongoClient _client;
+        private MongoClient? _client;
 
-        protected IServiceProvider _serviceProvider;
+        private ServiceProvider? _serviceProvider;
+        protected IServiceProvider Provider => _serviceProvider ?? throw new InvalidOperationException("Must be setup");
 
-        protected IMongoDatabase _db;
+        private IMongoDatabase? _db;
+        protected IMongoDatabase Db => _db ?? throw new InvalidOperationException("Must be setup");
 
-        protected MongoDbRunner _mongoToGoRunner;
+        private MongoDbRunner? _mongoToGoRunner;
 
         protected virtual string DatabaseName { get; set; } = "DatabaseMigration";
 
@@ -29,6 +31,7 @@ namespace Mongo.Migration.Tests.Migrations.Database
 
         public void Dispose()
         {
+            _serviceProvider?.Dispose();
             _mongoToGoRunner?.Dispose();
         }
 
@@ -40,7 +43,7 @@ namespace Mongo.Migration.Tests.Migrations.Database
             _db.CreateCollection(CollectionName);
 
 
-            ServiceCollection serviceCollection = new ServiceCollection();
+            ServiceCollection serviceCollection = new();
             serviceCollection
                 .AddLogging(l => l.AddProvider(NullLoggerProvider.Instance))
                 .AddSingleton<IMongoClient>(_client)
@@ -57,12 +60,12 @@ namespace Mongo.Migration.Tests.Migrations.Database
         protected void InsertMigrations(IEnumerable<DatabaseMigration> migrations)
         {
             var list = migrations.Select(m => new BsonDocument { { "MigrationId", m.GetType().ToString() }, { "Version", m.Version.ToString() } });
-            _db.GetCollection<BsonDocument>(MigrationsCollectionName).InsertManyAsync(list).Wait();
+            Db.GetCollection<BsonDocument>(MigrationsCollectionName).InsertManyAsync(list).Wait();
         }
 
         protected List<MigrationHistory> GetMigrationHistory()
         {
-            var migrationHistoryCollection = _db.GetCollection<MigrationHistory>(MigrationsCollectionName);
+            var migrationHistoryCollection = Db.GetCollection<MigrationHistory>(MigrationsCollectionName);
             return migrationHistoryCollection.Find(m => true).ToList();
         }
     }

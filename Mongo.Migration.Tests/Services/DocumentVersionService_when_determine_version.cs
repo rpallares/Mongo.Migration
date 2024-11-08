@@ -17,7 +17,7 @@ namespace Mongo.Migration.Tests.Services
         {
             OnSetUp();
 
-            _service = _serviceProvider.GetRequiredService<IDocumentVersionService>();
+            _service = Provider.GetRequiredService<IDocumentVersionService>();
         }
 
         [TearDown]

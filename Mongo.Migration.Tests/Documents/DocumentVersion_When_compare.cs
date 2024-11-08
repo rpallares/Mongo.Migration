@@ -7,11 +7,11 @@ namespace Mongo.Migration.Tests.Documents
     [TestFixture]
     public class DocumentVersion_When_compare
     {
-        private readonly DocumentVersion equalLowerVersion = new DocumentVersion("0.0.1");
+        private readonly DocumentVersion equalLowerVersion = new("0.0.1");
 
-        private readonly DocumentVersion higherVersion = new DocumentVersion("0.0.2");
+        private readonly DocumentVersion higherVersion = new("0.0.2");
 
-        private readonly DocumentVersion lowerVersion = new DocumentVersion("0.0.1");
+        private readonly DocumentVersion lowerVersion = new("0.0.1");
 
         [Test]
         public void If_higherVersion_lte_equalLowerVersion_Then_false()

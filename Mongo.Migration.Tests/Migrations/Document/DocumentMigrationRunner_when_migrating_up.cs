@@ -17,7 +17,7 @@ namespace Mongo.Migration.Tests.Migrations.Document
         {
             OnSetUp();
 
-            _runner = _serviceProvider.GetRequiredService<IDocumentMigrationRunner>();
+            _runner = Provider.GetRequiredService<IDocumentMigrationRunner>();
         }
 
         [TearDown]
@@ -30,7 +30,7 @@ namespace Mongo.Migration.Tests.Migrations.Document
         public void When_migrate_up_the_lowest_version_Then_all_migrations_are_used()
         {
             // Arrange
-            BsonDocument document = new BsonDocument
+            BsonDocument document = new()
             {
                 { "Version", "0.0.0" },
                 { "Dors", 3 }
@@ -48,7 +48,7 @@ namespace Mongo.Migration.Tests.Migrations.Document
         public void When_document_has_no_version_Then_all_migrations_are_used()
         {
             // Arrange
-            BsonDocument document = new BsonDocument
+            BsonDocument document = new()
             {
                 { "Dors", 3 }
             };
@@ -65,7 +65,7 @@ namespace Mongo.Migration.Tests.Migrations.Document
         public void When_document_has_current_version_Then_nothing_happens()
         {
             // Arrange
-            BsonDocument document = new BsonDocument
+            BsonDocument document = new()
             {
                 { "Version", "0.0.2" },
                 { "Door", 3 }

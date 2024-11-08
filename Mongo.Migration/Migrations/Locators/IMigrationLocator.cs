@@ -5,7 +5,7 @@ namespace Mongo.Migration.Migrations.Locators
     public interface IMigrationLocator<TMigrationType>
         where TMigrationType : class, IMigration
     {
-        IEnumerable<TMigrationType> GetMigrations(Type type);
+        IReadOnlyCollection<TMigrationType> GetMigrations(Type type);
 
         IEnumerable<TMigrationType> GetMigrationsGt(Type type, DocumentVersion version);
 

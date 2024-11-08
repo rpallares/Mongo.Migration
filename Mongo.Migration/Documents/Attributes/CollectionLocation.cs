@@ -5,9 +5,9 @@ namespace Mongo.Migration.Documents.Attributes
     {
         public CollectionLocationInformation CollectionInformation { get; }
 
-        public CollectionLocation(string collectionName, string databaseName = null)
+        public CollectionLocation(string collectionName, string? databaseName = null)
         {
-            CollectionInformation = new CollectionLocationInformation(databaseName, collectionName);
+            CollectionInformation = new(databaseName, collectionName);
         }
     }
 }

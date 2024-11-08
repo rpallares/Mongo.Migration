@@ -10,15 +10,19 @@ namespace Mongo.Migration.Tests
 {
     public class IntegrationTest : IDisposable
     {
-        protected IMongoClient _client;
+        private MongoClient? _client;
 
-        protected IServiceProvider _serviceProvider;
+        private MongoDbRunner? _mongoToGoRunner;
 
-        protected MongoDbRunner _mongoToGoRunner;
+        private ServiceProvider? _serviceProvider;
+
+        protected IServiceProvider Provider => _serviceProvider ?? throw new InvalidOperationException("Must be setup");
 
         public void Dispose()
         {
+            _serviceProvider?.Dispose();
             _mongoToGoRunner?.Dispose();
+            GC.SuppressFinalize(this);
         }
 
         protected void OnSetUp()
@@ -28,7 +32,7 @@ namespace Mongo.Migration.Tests
 
             _client.GetDatabase("PerformanceTest").CreateCollection("Test");
 
-            ServiceCollection serviceCollection = new ServiceCollection();
+            ServiceCollection serviceCollection = new();
             serviceCollection
                 .AddLogging(l => l.AddProvider(NullLoggerProvider.Instance))
                 .AddSingleton<IMongoClient>(_client)

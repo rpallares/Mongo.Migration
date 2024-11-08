@@ -51,7 +51,7 @@ namespace Mongo.Migration.Tests.Documents.Serializers
         [SetUp]
         public void SetUp()
         {
-            _serializer = new DocumentVersionSerializer();
+            _serializer = new();
         }
 
         private static BsonDocumentReader CreateVersionReader(BsonDocument document)
@@ -64,7 +64,7 @@ namespace Mongo.Migration.Tests.Documents.Serializers
 
         private static BsonDocumentWriter CreateVersionWriter()
         {
-            var writer = new BsonDocumentWriter(new BsonDocument());
+            var writer = new BsonDocumentWriter(new());
             writer.WriteStartDocument();
             writer.WriteName("version");
             return writer;

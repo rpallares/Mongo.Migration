@@ -5,7 +5,7 @@ namespace Mongo.Migration.Migrations.Locators
 {
     internal class DatabaseTypeMigrationDependencyLocator : TypeMigrationDependencyLocator<IDatabaseMigration>, IDatabaseTypeMigrationDependencyLocator
     {
-        private IDictionary<Type, IReadOnlyCollection<IDatabaseMigration>> _migrations;
+        private IDictionary<Type, IReadOnlyCollection<IDatabaseMigration>>? _migrations;
 
         protected override IDictionary<Type, IReadOnlyCollection<IDatabaseMigration>> Migrations
         {
@@ -16,12 +16,9 @@ namespace Mongo.Migration.Migrations.Locators
                     Locate();
                 }
 
-                return _migrations;
+                return _migrations!;
             }
-            set
-            {
-                _migrations = value;
-            }
+            set => _migrations = value;
         }
 
         public DatabaseTypeMigrationDependencyLocator(ILogger<DatabaseTypeMigrationDependencyLocator> logger, IServiceProvider serviceProvider)

@@ -5,11 +5,6 @@ namespace Mongo.Migration.Extensions
 {
     internal static class EnumerableExtensions
     {
-        internal static bool NullOrEmpty<T>(this IEnumerable<T> list)
-        {
-            return list == null || !list.Any();
-        }
-
         internal static IEnumerable<TMigrationType> CheckForDuplicates<TMigrationType>(this IEnumerable<TMigrationType> list)
             where TMigrationType : class, IMigration
         {

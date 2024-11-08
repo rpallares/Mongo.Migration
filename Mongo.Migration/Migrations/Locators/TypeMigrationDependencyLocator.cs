@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Mongo.Migration.Extensions;
 
@@ -28,31 +29,35 @@ namespace Mongo.Migration.Migrations.Locators
 
         private TMigrationType GetMigrationInstance(Type type)
         {
-            ConstructorInfo constructor = type.GetConstructors()[0];
+            ConstructorInfo[] constructors = type.GetConstructors();
 
-            if (constructor != null)
+            if (constructors.Length > 0)
             {
-                object[] args = constructor
+                object[] args = constructors
+                    .First()
                     .GetParameters()
-                    .Select(parameterInfo => _serviceProvider.GetService(parameterInfo.ParameterType))
+                    .Select(parameterInfo => _serviceProvider.GetRequiredService(parameterInfo.ParameterType))
                     .ToArray();
 
-                return Activator.CreateInstance(type, args) as TMigrationType;
+                return Activator.CreateInstance(type, args) as TMigrationType
+                       ?? throw new InvalidOperationException($"Cannot create {type} migration");
             }
 
-            return Activator.CreateInstance(type) as TMigrationType;
+            return Activator.CreateInstance(type) as TMigrationType
+                   ?? throw new InvalidOperationException($"Cannot create {type} migration");
         }
 
         private class TypeComparer : IEqualityComparer<Type>
         {
-            public bool Equals(Type x, Type y)
+            public bool Equals(Type? x, Type? y)
             {
-                return x.AssemblyQualifiedName == y.AssemblyQualifiedName;
+                return x?.AssemblyQualifiedName == y?.AssemblyQualifiedName;
             }
 
             public int GetHashCode(Type obj)
             {
-                return obj.AssemblyQualifiedName.GetHashCode();
+                return obj.AssemblyQualifiedName?.GetHashCode()
+                    ?? throw new InvalidOperationException($"Cannot get AssemblyQualifiedName from {obj}");
             }
         }
     }

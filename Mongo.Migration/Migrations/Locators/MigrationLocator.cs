@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Mongo.Migration.Documents;
 using Mongo.Migration.Exceptions;
-using Mongo.Migration.Extensions;
 
 namespace Mongo.Migration.Migrations.Locators
 {
@@ -11,41 +10,45 @@ namespace Mongo.Migration.Migrations.Locators
     {
         private readonly ILogger<MigrationLocator<TMigrationType>> _logger;
 
-        private IEnumerable<Assembly> _assemblies;
+        private readonly List<Assembly> _assemblies;
 
-        private IDictionary<Type, IReadOnlyCollection<TMigrationType>> _migrations;
+        private IDictionary<Type, IReadOnlyCollection<TMigrationType>>? _migrations;
 
         protected MigrationLocator(ILogger<MigrationLocator<TMigrationType>> logger)
         {
             _logger = logger;
+            _assemblies = GetAssemblies();
         }
 
-        protected IEnumerable<Assembly> Assemblies => _assemblies ??= GetAssemblies();
+        protected IEnumerable<Assembly> Assemblies => _assemblies;
 
         protected virtual IDictionary<Type, IReadOnlyCollection<TMigrationType>> Migrations
         {
             get
             {
-                if (_migrations == null)
+                if (_migrations is null)
                 {
                     Locate();
                 }
 
-                if (_migrations.NullOrEmpty())
+                if (_migrations is null || _migrations.Count <= 0)
                 {
                     _logger.LogInformation(new NoMigrationsFoundException(), "No migration found");
                 }
 
-                return _migrations;
+                return _migrations!;
             }
             set => _migrations = value;
         }
 
-        public IEnumerable<TMigrationType> GetMigrations(Type type)
+        public IReadOnlyCollection<TMigrationType> GetMigrations(Type type)
         {
-            Migrations.TryGetValue(type, out var migrations);
+            if(Migrations.TryGetValue(type, out var migrations))
+            {
+                return migrations;
+            }
 
-            return migrations ?? Enumerable.Empty<TMigrationType>();
+            return Array.Empty<TMigrationType>();
         }
 
         public IEnumerable<TMigrationType> GetMigrationsFromTo(Type type, DocumentVersion version, DocumentVersion otherVersion)
@@ -83,17 +86,14 @@ namespace Mongo.Migration.Migrations.Locators
         {
             var migrations = GetMigrations(type);
 
-            if (migrations == null || !migrations.Any())
-            {
-                return DocumentVersion.Default();
-            }
-
-            return migrations.Max(m => m.Version);
+            return migrations.Count > 0
+                ? migrations.Max(m => m.Version)
+                : DocumentVersion.Default();
         }
 
         public abstract void Locate();
 
-        private static IReadOnlyList<Assembly> GetAssemblies()
+        private static List<Assembly> GetAssemblies()
         {
             var location = AppDomain.CurrentDomain.BaseDirectory;
             var path = Path.GetDirectoryName(location);

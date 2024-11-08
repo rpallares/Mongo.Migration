@@ -5,11 +5,11 @@ using MongoDB.Bson.Serialization;
 
 namespace Mongo.Migration.Documents
 {
-    public struct DocumentVersion : IComparable<DocumentVersion>
+    public readonly struct DocumentVersion : IComparable<DocumentVersion>
     {
-        private const char VERSION_SPLIT_CHAR = '.';
+        private const char VersionSplitChar = '.';
 
-        private const int MAX_LENGTH = 3;
+        private const int MaxLength = 3;
 
         public int Major { get; init; }
 
@@ -30,9 +30,9 @@ namespace Mongo.Migration.Documents
 
         public DocumentVersion(string version)
         {
-            string[] versionParts = version.Split(VERSION_SPLIT_CHAR);
+            string[] versionParts = version.Split(VersionSplitChar);
 
-            if (versionParts.Length != MAX_LENGTH)
+            if (versionParts.Length != MaxLength)
             {
                 throw new VersionStringToLongException(version);
             }
@@ -58,12 +58,12 @@ namespace Mongo.Migration.Documents
 
         public static DocumentVersion Empty()
         {
-            return new DocumentVersion(-1, 0, 0);
+            return new(-1, 0, 0);
         }
 
         public static implicit operator DocumentVersion(string version)
         {
-            return new DocumentVersion(version);
+            return new(version);
         }
 
         public static implicit operator string(DocumentVersion documentVersion)
@@ -123,9 +123,9 @@ namespace Mongo.Migration.Documents
             return other.Major == Major && other.Minor == Minor && other.Revision == Revision;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            if (ReferenceEquals(null, obj))
+            if (obj is null)
             {
                 return false;
             }
@@ -140,21 +140,14 @@ namespace Mongo.Migration.Documents
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                int result = Major;
-                result = (result * 397) ^ Minor;
-                result = (result * 397) ^ Revision;
-                return result;
-            }
+            return HashCode.Combine(Major, Minor, Revision);
         }
 
         private static int ParseVersionPart(string value)
         {
-            string revisionString = value;
-            if (!int.TryParse(revisionString, out var target))
+            if (!int.TryParse(value, out int target))
             {
-                throw new InvalidVersionValueException(revisionString);
+                throw new InvalidVersionValueException(value);
             }
 
             return target;

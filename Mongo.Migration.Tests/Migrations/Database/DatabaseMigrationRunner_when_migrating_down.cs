@@ -8,15 +8,15 @@ using NUnit.Framework;
 namespace Mongo.Migration.Tests.Migrations.Database
 {
     [TestFixture]
-    internal class DatabaseMigrationRunner_when_migrating_down : DatabaseIntegrationTest
+    internal class DatabaseMigrationRunnerWhenMigratingDown : DatabaseIntegrationTest
     {
-        private IDatabaseMigrationRunner _runner;
+        private IDatabaseMigrationRunner? _runner;
 
         protected override void OnSetUp(DocumentVersion databaseMigrationVersion)
         {
             base.OnSetUp(databaseMigrationVersion);
 
-            _runner = _serviceProvider.GetRequiredService<IDatabaseMigrationRunner>();
+            _runner = Provider.GetRequiredService<IDatabaseMigrationRunner>();
         }
 
         [TearDown]
@@ -40,7 +40,7 @@ namespace Mongo.Migration.Tests.Migrations.Database
                 });
 
             // Act
-            _runner.Run(_db);
+            _runner?.Run(Db);
 
             // Assert
             var migrations = GetMigrationHistory();
@@ -50,7 +50,7 @@ namespace Mongo.Migration.Tests.Migrations.Database
         [Test]
         public void When_database_has_migrations_Then_down_to_selected_migration()
         {
-            OnSetUp(new DocumentVersion("0.0.1"));
+            OnSetUp(new("0.0.1"));
 
             // Arrange
             InsertMigrations(
@@ -62,7 +62,7 @@ namespace Mongo.Migration.Tests.Migrations.Database
                 });
 
             // Act
-            _runner.Run(_db);
+            _runner?.Run(Db);
 
             // Assert
             var migrations = GetMigrationHistory();

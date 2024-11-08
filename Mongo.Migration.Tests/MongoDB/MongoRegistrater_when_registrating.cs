@@ -26,7 +26,7 @@ namespace Mongo.Migration.Tests.MongoDB
         public void Then_serializer_is_registered()
         {
             // Arrange 
-            var migrationService = _serviceProvider.GetRequiredService<IMigrationService>();
+            var migrationService = Provider.GetRequiredService<IMigrationService>();
 
             // Act
             migrationService.Migrate();
