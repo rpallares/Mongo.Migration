@@ -5,40 +5,39 @@ using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 
-namespace Mongo.Migration.Services.Interceptors
+namespace Mongo.Migration.Services.Interceptors;
+
+internal class MigrationInterceptor<TDocument> : BsonClassMapSerializer<TDocument>
+    where TDocument : class, IDocument
 {
-    internal class MigrationInterceptor<TDocument> : BsonClassMapSerializer<TDocument>
-        where TDocument : class, IDocument
+    private readonly IDocumentVersionService _documentVersionService;
+
+    private readonly IDocumentMigrationRunner _migrationRunner;
+
+    public MigrationInterceptor(IDocumentMigrationRunner migrationRunner, IDocumentVersionService documentVersionService)
+        : base(BsonClassMap.LookupClassMap(typeof(TDocument)))
     {
-        private readonly IDocumentVersionService _documentVersionService;
+        _migrationRunner = migrationRunner;
+        _documentVersionService = documentVersionService;
+    }
 
-        private readonly IDocumentMigrationRunner _migrationRunner;
+    public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, TDocument value)
+    {
+        _documentVersionService.DetermineVersion(value);
 
-        public MigrationInterceptor(IDocumentMigrationRunner migrationRunner, IDocumentVersionService documentVersionService)
-            : base(BsonClassMap.LookupClassMap(typeof(TDocument)))
-        {
-            _migrationRunner = migrationRunner;
-            _documentVersionService = documentVersionService;
-        }
+        base.Serialize(context, args, value);
+    }
 
-        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, TDocument value)
-        {
-            _documentVersionService.DetermineVersion(value);
+    public override TDocument Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+    {
+        // TODO: Performance? LatestVersion, dont do anything
+        var document = BsonDocumentSerializer.Instance.Deserialize(context);
 
-            base.Serialize(context, args, value);
-        }
+        _migrationRunner.Run(typeof(TDocument), document);
 
-        public override TDocument Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
-        {
-            // TODO: Performance? LatestVersion, dont do anything
-            var document = BsonDocumentSerializer.Instance.Deserialize(context);
+        var migratedContext =
+            BsonDeserializationContext.CreateRoot(new BsonDocumentReader(document));
 
-            _migrationRunner.Run(typeof(TDocument), document);
-
-            var migratedContext =
-                BsonDeserializationContext.CreateRoot(new BsonDocumentReader(document));
-
-            return base.Deserialize(migratedContext, args);
-        }
+        return base.Deserialize(migratedContext, args);
     }
 }

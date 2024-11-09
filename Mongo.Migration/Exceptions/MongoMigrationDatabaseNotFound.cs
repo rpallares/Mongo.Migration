@@ -1,11 +1,10 @@
-namespace Mongo.Migration.Exceptions
+namespace Mongo.Migration.Exceptions;
+
+internal class MongoMigrationDatabaseNotFound
+    : Exception
 {
-    internal class MongoMigrationDatabaseNotFound
-        : Exception
+    public MongoMigrationDatabaseNotFound(string databaseName, string valueConnectionString)
+        : base(string.Format(ErrorTexts.ConnectionCheckError, databaseName, valueConnectionString))
     {
-        public MongoMigrationDatabaseNotFound(string databaseName, string valueConnectionString)
-            : base(string.Format(ErrorTexts.ConnectionCheckError, databaseName, valueConnectionString))
-        {
-        }
     }
 }

@@ -3,30 +3,29 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 
-namespace Mongo.Migration.Services.Interceptors
+namespace Mongo.Migration.Services.Interceptors;
+
+internal class MigrationInterceptorProvider : IMigrationInterceptorProvider
 {
-    internal class MigrationInterceptorProvider : IMigrationInterceptorProvider
+    private readonly IMigrationInterceptorFactory _migrationInterceptorFactory;
+
+    public MigrationInterceptorProvider(IMigrationInterceptorFactory migrationInterceptorFactory)
     {
-        private readonly IMigrationInterceptorFactory _migrationInterceptorFactory;
+        _migrationInterceptorFactory = migrationInterceptorFactory;
+    }
 
-        public MigrationInterceptorProvider(IMigrationInterceptorFactory migrationInterceptorFactory)
+    public IBsonSerializer GetSerializer(Type type)
+    {
+        if (ShouldBeMigrated(type))
         {
-            _migrationInterceptorFactory = migrationInterceptorFactory;
+            return _migrationInterceptorFactory.Create(type);
         }
 
-        public IBsonSerializer GetSerializer(Type type)
-        {
-            if (ShouldBeMigrated(type))
-            {
-                return _migrationInterceptorFactory.Create(type);
-            }
+        return null;
+    }
 
-            return null;
-        }
-
-        private static bool ShouldBeMigrated(Type type)
-        {
-            return type.GetInterfaces().Contains(typeof(IDocument)) && type != typeof(BsonDocument);
-        }
+    private static bool ShouldBeMigrated(Type type)
+    {
+        return type.GetInterfaces().Contains(typeof(IDocument)) && type != typeof(BsonDocument);
     }
 }

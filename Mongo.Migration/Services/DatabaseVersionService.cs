@@ -5,60 +5,59 @@ using Mongo.Migration.Startup;
 
 using MongoDB.Driver;
 
-namespace Mongo.Migration.Services
+namespace Mongo.Migration.Services;
+
+internal class DatabaseVersionService : IDatabaseVersionService
 {
-    internal class DatabaseVersionService : IDatabaseVersionService
+    private const string MigrationsCollectionName = "_migrations";
+
+    private readonly IDatabaseTypeMigrationDependencyLocator _migrationLocator;
+
+    private readonly IMongoMigrationSettings _mongoMigrationSettings;
+
+    public DatabaseVersionService(
+        IDatabaseTypeMigrationDependencyLocator migrationLocator,
+        IMongoMigrationSettings mongoMigrationSettings)
     {
-        private const string MigrationsCollectionName = "_migrations";
+        _migrationLocator = migrationLocator;
+        _mongoMigrationSettings = mongoMigrationSettings;
+    }
 
-        private readonly IDatabaseTypeMigrationDependencyLocator _migrationLocator;
+    public DocumentVersion GetCurrentOrLatestMigrationVersion()
+    {
+        return _mongoMigrationSettings.DatabaseMigrationVersion > DocumentVersion.Empty()
+            ? _mongoMigrationSettings.DatabaseMigrationVersion
+            : _migrationLocator.GetLatestVersion(typeof(DatabaseMigration));
+    }
 
-        private readonly IMongoMigrationSettings _mongoMigrationSettings;
-
-        public DatabaseVersionService(
-            IDatabaseTypeMigrationDependencyLocator migrationLocator,
-            IMongoMigrationSettings mongoMigrationSettings)
+    public DocumentVersion GetLatestDatabaseVersion(IMongoDatabase db)
+    {
+        var migrations = GetMigrationsCollection(db).Find(m => true).ToList();
+        if (migrations == null || migrations.Count <= 0)
         {
-            _migrationLocator = migrationLocator;
-            _mongoMigrationSettings = mongoMigrationSettings;
+            return DocumentVersion.Default();
         }
 
-        public DocumentVersion GetCurrentOrLatestMigrationVersion()
-        {
-            return _mongoMigrationSettings.DatabaseMigrationVersion > DocumentVersion.Empty()
-                       ? _mongoMigrationSettings.DatabaseMigrationVersion
-                       : _migrationLocator.GetLatestVersion(typeof(DatabaseMigration));
-        }
+        return migrations.Max(m => m.Version);
+    }
 
-        public DocumentVersion GetLatestDatabaseVersion(IMongoDatabase db)
-        {
-            var migrations = GetMigrationsCollection(db).Find(m => true).ToList();
-            if (migrations == null || migrations.Count <= 0)
+    public void Save(IMongoDatabase db, IDatabaseMigration migration)
+    {
+        GetMigrationsCollection(db).InsertOne(
+            new()
             {
-                return DocumentVersion.Default();
-            }
+                MigrationId = migration.GetType().ToString(),
+                Version = migration.Version
+            });
+    }
 
-            return migrations.Max(m => m.Version);
-        }
+    public void Remove(IMongoDatabase db, IDatabaseMigration migration)
+    {
+        GetMigrationsCollection(db).DeleteOne(Builders<MigrationHistory>.Filter.Eq(mh => mh.MigrationId, migration.GetType().ToString()));
+    }
 
-        public void Save(IMongoDatabase db, IDatabaseMigration migration)
-        {
-            GetMigrationsCollection(db).InsertOne(
-                new()
-                {
-                    MigrationId = migration.GetType().ToString(),
-                    Version = migration.Version
-                });
-        }
-
-        public void Remove(IMongoDatabase db, IDatabaseMigration migration)
-        {
-            GetMigrationsCollection(db).DeleteOne(Builders<MigrationHistory>.Filter.Eq(mh => mh.MigrationId, migration.GetType().ToString()));
-        }
-
-        private static IMongoCollection<MigrationHistory> GetMigrationsCollection(IMongoDatabase db)
-        {
-            return db.GetCollection<MigrationHistory>(MigrationsCollectionName);
-        }
+    private static IMongoCollection<MigrationHistory> GetMigrationsCollection(IMongoDatabase db)
+    {
+        return db.GetCollection<MigrationHistory>(MigrationsCollectionName);
     }
 }

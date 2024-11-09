@@ -2,27 +2,26 @@
 using Mongo.Migration.Documents;
 using NUnit.Framework;
 
-namespace Mongo.Migration.Tests.Documents
+namespace Mongo.Migration.Tests.Documents;
+
+[TestFixture]
+public class DocumentVersion_When_casting
 {
-    [TestFixture]
-    public class DocumentVersion_When_casting
+    [Test]
+    public void If_implicit_string_to_version_Then_cast_should_work()
     {
-        [Test]
-        public void If_implicit_string_to_version_Then_cast_should_work()
-        {
-            DocumentVersion version = "1.0.2";
+        DocumentVersion version = "1.0.2";
 
-            version.ToString().Should().Be("1.0.2");
-        }
+        version.ToString().Should().Be("1.0.2");
+    }
 
-        [Test]
-        public void If_implicit_version_to_string_Then_cast_should_work()
-        {
-            var version = new DocumentVersion("1.0.2");
+    [Test]
+    public void If_implicit_version_to_string_Then_cast_should_work()
+    {
+        var version = new DocumentVersion("1.0.2");
 
-            string versionString = version;
+        string versionString = version;
 
-            versionString.Should().Be("1.0.2");
-        }
+        versionString.Should().Be("1.0.2");
     }
 }

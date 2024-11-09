@@ -2,26 +2,25 @@
 
 using MongoDB.Bson.Serialization;
 
-namespace Mongo.Migration.Services.Interceptors
+namespace Mongo.Migration.Services.Interceptors;
+
+internal class MigrationInterceptorFactory : IMigrationInterceptorFactory
 {
-    internal class MigrationInterceptorFactory : IMigrationInterceptorFactory
+    private readonly IDocumentVersionService _documentVersionService;
+
+    private readonly IDocumentMigrationRunner _migrationRunner;
+
+    public MigrationInterceptorFactory(IDocumentMigrationRunner migrationRunner, IDocumentVersionService documentVersionService)
     {
-        private readonly IDocumentVersionService _documentVersionService;
+        _migrationRunner = migrationRunner;
+        _documentVersionService = documentVersionService;
+    }
 
-        private readonly IDocumentMigrationRunner _migrationRunner;
-
-        public MigrationInterceptorFactory(IDocumentMigrationRunner migrationRunner, IDocumentVersionService documentVersionService)
-        {
-            _migrationRunner = migrationRunner;
-            _documentVersionService = documentVersionService;
-        }
-
-        public IBsonSerializer Create(Type type)
-        {
-            var genericType = typeof(MigrationInterceptor<>).MakeGenericType(type);
-            var interceptor = Activator.CreateInstance(genericType, _migrationRunner, _documentVersionService);
-            return interceptor as IBsonSerializer
-                ?? throw new InvalidOperationException($"Cannot create {genericType} interceptor");
-        }
+    public IBsonSerializer Create(Type type)
+    {
+        var genericType = typeof(MigrationInterceptor<>).MakeGenericType(type);
+        var interceptor = Activator.CreateInstance(genericType, _migrationRunner, _documentVersionService);
+        return interceptor as IBsonSerializer
+               ?? throw new InvalidOperationException($"Cannot create {genericType} interceptor");
     }
 }

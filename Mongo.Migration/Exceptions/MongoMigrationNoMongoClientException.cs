@@ -1,10 +1,9 @@
-﻿namespace Mongo.Migration.Exceptions
+﻿namespace Mongo.Migration.Exceptions;
+
+public class MongoMigrationNoMongoClientException : Exception
 {
-    public class MongoMigrationNoMongoClientException : Exception
+    public MongoMigrationNoMongoClientException()
+        : base(string.Format(ErrorTexts.NoMongoClient))
     {
-        public MongoMigrationNoMongoClientException()
-            : base(string.Format(ErrorTexts.NoMongoClient))
-        {
-        }
     }
 }

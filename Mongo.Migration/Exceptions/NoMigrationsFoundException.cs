@@ -1,6 +1,5 @@
-﻿namespace Mongo.Migration.Exceptions
+﻿namespace Mongo.Migration.Exceptions;
+
+public class NoMigrationsFoundException : Exception
 {
-    public class NoMigrationsFoundException : Exception
-    {
-    }
 }

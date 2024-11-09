@@ -1,13 +1,12 @@
-﻿namespace Mongo.Migration.Documents.Attributes
-{
-    [AttributeUsage(AttributeTargets.Class)]
-    public class RuntimeVersion : Attribute
-    {
-        public DocumentVersion Version { get; }
+﻿namespace Mongo.Migration.Documents.Attributes;
 
-        public RuntimeVersion(string version)
-        {
-            Version = version;
-        }
+[AttributeUsage(AttributeTargets.Class)]
+public class RuntimeVersion : Attribute
+{
+    public DocumentVersion Version { get; }
+
+    public RuntimeVersion(string version)
+    {
+        Version = version;
     }
 }

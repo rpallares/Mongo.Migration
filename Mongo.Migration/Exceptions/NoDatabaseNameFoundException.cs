@@ -1,6 +1,5 @@
-namespace Mongo.Migration.Exceptions
+namespace Mongo.Migration.Exceptions;
+
+internal class NoDatabaseNameFoundException : Exception
 {
-    internal class NoDatabaseNameFoundException : Exception
-    {
-    }
 }

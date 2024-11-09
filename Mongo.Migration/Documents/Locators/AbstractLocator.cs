@@ -1,28 +1,27 @@
-namespace Mongo.Migration.Documents.Locators
+namespace Mongo.Migration.Documents.Locators;
+
+public abstract class AbstractLocator<TReturnType, TTypeIdentifier> : ILocator<TReturnType, TTypeIdentifier>
+    where TReturnType : struct
+    where TTypeIdentifier : class
 {
-    public abstract class AbstractLocator<TReturnType, TTypeIdentifier> : ILocator<TReturnType, TTypeIdentifier>
-        where TReturnType : struct
-        where TTypeIdentifier : class
+    private IDictionary<TTypeIdentifier, TReturnType>? _locatesDictionary;
+
+    protected IDictionary<TTypeIdentifier, TReturnType> LocatesDictionary
     {
-        private IDictionary<TTypeIdentifier, TReturnType>? _locatesDictionary;
-
-        protected IDictionary<TTypeIdentifier, TReturnType> LocatesDictionary
+        get
         {
-            get
+            if (_locatesDictionary == null)
             {
-                if (_locatesDictionary == null)
-                {
-                    Locate();
-                }
-
-                return _locatesDictionary!;
+                Locate();
             }
 
-            set => _locatesDictionary = value;
+            return _locatesDictionary!;
         }
 
-        public abstract TReturnType? GetLocateOrNull(TTypeIdentifier identifier);
-
-        public abstract void Locate();
+        set => _locatesDictionary = value;
     }
+
+    public abstract TReturnType? GetLocateOrNull(TTypeIdentifier identifier);
+
+    public abstract void Locate();
 }

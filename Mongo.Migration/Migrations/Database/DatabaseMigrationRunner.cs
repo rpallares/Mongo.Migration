@@ -4,93 +4,92 @@ using Mongo.Migration.Migrations.Locators;
 using Mongo.Migration.Services;
 using MongoDB.Driver;
 
-namespace Mongo.Migration.Migrations.Database
+namespace Mongo.Migration.Migrations.Database;
+
+internal class DatabaseMigrationRunner : IDatabaseMigrationRunner
 {
-    internal class DatabaseMigrationRunner : IDatabaseMigrationRunner
+    private readonly IDatabaseVersionService _databaseVersionService;
+
+    private readonly ILogger _logger;
+
+    private readonly Type _databaseMigrationType = typeof(DatabaseMigration);
+
+    private readonly IDatabaseTypeMigrationDependencyLocator _migrationLocator;
+
+    public DatabaseMigrationRunner(
+        IDatabaseTypeMigrationDependencyLocator migrationLocator,
+        IDatabaseVersionService databaseVersionService,
+        ILogger<DatabaseMigrationRunner> logger)
     {
-        private readonly IDatabaseVersionService _databaseVersionService;
+        _migrationLocator = migrationLocator;
+        _databaseVersionService = databaseVersionService;
+        _logger = logger;
+    }
 
-        private readonly ILogger _logger;
+    public void Run(IMongoDatabase db)
+    {
+        _logger.LogInformation("Database migration started.");
+        var databaseVersion = _databaseVersionService.GetLatestDatabaseVersion(db);
+        var currentOrLatest = _databaseVersionService.GetCurrentOrLatestMigrationVersion();
 
-        private readonly Type _databaseMigrationType = typeof(DatabaseMigration);
-
-        private readonly IDatabaseTypeMigrationDependencyLocator _migrationLocator;
-
-        public DatabaseMigrationRunner(
-            IDatabaseTypeMigrationDependencyLocator migrationLocator,
-            IDatabaseVersionService databaseVersionService,
-            ILogger<DatabaseMigrationRunner> logger)
+        if (databaseVersion == currentOrLatest)
         {
-            _migrationLocator = migrationLocator;
-            _databaseVersionService = databaseVersionService;
-            _logger = logger;
+            return;
         }
 
-        public void Run(IMongoDatabase db)
+        MigrateUpOrDown(db, databaseVersion, currentOrLatest);
+        _logger.LogInformation("Database migration finished.");
+    }
+
+    private void MigrateUpOrDown(
+        IMongoDatabase db,
+        DocumentVersion databaseVersion,
+        DocumentVersion to)
+    {
+        if (databaseVersion > to)
         {
-            _logger.LogInformation("Database migration started.");
-            var databaseVersion = _databaseVersionService.GetLatestDatabaseVersion(db);
-            var currentOrLatest = _databaseVersionService.GetCurrentOrLatestMigrationVersion();
-
-            if (databaseVersion == currentOrLatest)
-            {
-                return;
-            }
-
-            MigrateUpOrDown(db, databaseVersion, currentOrLatest);
-            _logger.LogInformation("Database migration finished.");
+            MigrateDown(db, databaseVersion, to);
+            return;
         }
 
-        private void MigrateUpOrDown(
-            IMongoDatabase db,
-            DocumentVersion databaseVersion,
-            DocumentVersion to)
-        {
-            if (databaseVersion > to)
-            {
-                MigrateDown(db, databaseVersion, to);
-                return;
-            }
+        MigrateUp(db, databaseVersion, to);
+    }
 
-            MigrateUp(db, databaseVersion, to);
+    private void MigrateUp(IMongoDatabase db, DocumentVersion currentVersion, DocumentVersion toVersion)
+    {
+        var migrations = _migrationLocator.GetMigrationsFromTo(_databaseMigrationType, currentVersion, toVersion).ToList();
+
+        foreach (var migration in migrations)
+        {
+            _logger.LogInformation("Database Migration Up: {Type}:{Version} ", currentVersion.GetType(), migration.Version);
+
+            migration.Up(db);
+            _databaseVersionService.Save(db, migration);
+
+            _logger.LogInformation("Database Migration Up finished successful: {Type}:{Version} ", migration.GetType(), migration.Version);
         }
+    }
 
-        private void MigrateUp(IMongoDatabase db, DocumentVersion currentVersion, DocumentVersion toVersion)
+    private void MigrateDown(IMongoDatabase db, DocumentVersion currentVersion, DocumentVersion toVersion)
+    {
+        var migrations = _migrationLocator
+            .GetMigrationsGtEq(_databaseMigrationType, toVersion)
+            .OrderByDescending(m => m.Version)
+            .ToList();
+
+        foreach (var migration in migrations)
         {
-            var migrations = _migrationLocator.GetMigrationsFromTo(_databaseMigrationType, currentVersion, toVersion).ToList();
-
-            foreach (var migration in migrations)
+            if (migration.Version == toVersion)
             {
-                _logger.LogInformation("Database Migration Up: {Type}:{Version} ", currentVersion.GetType(), migration.Version);
-
-                migration.Up(db);
-                _databaseVersionService.Save(db, migration);
-
-                _logger.LogInformation("Database Migration Up finished successful: {Type}:{Version} ", migration.GetType(), migration.Version);
+                break;
             }
-        }
 
-        private void MigrateDown(IMongoDatabase db, DocumentVersion currentVersion, DocumentVersion toVersion)
-        {
-            var migrations = _migrationLocator
-                .GetMigrationsGtEq(_databaseMigrationType, toVersion)
-                .OrderByDescending(m => m.Version)
-                .ToList();
+            _logger.LogInformation("Database Migration Down: {Type}:{Version} ", migration.GetType(), migration.Version);
 
-            foreach (var migration in migrations)
-            {
-                if (migration.Version == toVersion)
-                {
-                    break;
-                }
+            migration.Down(db);
+            _databaseVersionService.Remove(db, migration);
 
-                _logger.LogInformation("Database Migration Down: {Type}:{Version} ", migration.GetType(), migration.Version);
-
-                migration.Down(db);
-                _databaseVersionService.Remove(db, migration);
-
-                _logger.LogInformation("Database Migration Down finished successful: {Type}:{Version} ", migration.GetType(), migration.Version);
-            }
+            _logger.LogInformation("Database Migration Down finished successful: {Type}:{Version} ", migration.GetType(), migration.Version);
         }
     }
 }

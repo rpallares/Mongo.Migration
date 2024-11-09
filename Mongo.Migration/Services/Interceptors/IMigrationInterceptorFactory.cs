@@ -1,9 +1,8 @@
 ﻿using MongoDB.Bson.Serialization;
 
-namespace Mongo.Migration.Services.Interceptors
+namespace Mongo.Migration.Services.Interceptors;
+
+internal interface IMigrationInterceptorFactory
 {
-    internal interface IMigrationInterceptorFactory
-    {
-        IBsonSerializer Create(Type type);
-    }
+    IBsonSerializer Create(Type type);
 }

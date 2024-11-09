@@ -4,69 +4,68 @@ using Mongo.Migration.Migrations.Locators;
 using Mongo.Migration.Tests.TestDoubles;
 using NUnit.Framework;
 
-namespace Mongo.Migration.Tests.Migrations.Locators
+namespace Mongo.Migration.Tests.Migrations.Locators;
+
+[TestFixture]
+public class TypeMigrationLocatorWhenLocate
 {
-    [TestFixture]
-    public class TypeMigrationLocatorWhenLocate
+    private TypeMigrationLocator _locator;
+
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
     {
-        private TypeMigrationLocator _locator;
+        // Arrange
+        _locator = new TypeMigrationLocator(NullLogger<TypeMigrationLocator>.Instance);
+    }
 
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            // Arrange
-            _locator = new TypeMigrationLocator(NullLogger<TypeMigrationLocator>.Instance);
-        }
+    [Test]
+    public void When_document_has_one_migration_Then_migrations_count_should_be_one()
+    {
+        // Act
+        var result = _locator.GetMigrations(typeof(TestDocumentWithOneMigration));
 
-        [Test]
-        public void When_document_has_one_migration_Then_migrations_count_should_be_one()
-        {
-            // Act
-            var result = _locator.GetMigrations(typeof(TestDocumentWithOneMigration));
+        // Assert
+        result.Count.Should().Be(1);
+    }
 
-            // Assert
-            result.Count.Should().Be(1);
-        }
+    [Test]
+    public void When_document_has_two_migration_Then_migrations_count_should_be_two()
+    {
+        // Act
+        var result = _locator.GetMigrations(typeof(TestDocumentWithTwoMigration));
 
-        [Test]
-        public void When_document_has_two_migration_Then_migrations_count_should_be_two()
-        {
-            // Act
-            var result = _locator.GetMigrations(typeof(TestDocumentWithTwoMigration));
+        // Assert
+        result.Count.Should().Be(2);
+    }
 
-            // Assert
-            result.Count.Should().Be(2);
-        }
+    [Test]
+    public void When_get_latest_version_of_migrations()
+    {
+        // Act
+        var version = _locator.GetLatestVersion(typeof(TestDocumentWithTwoMigration));
 
-        [Test]
-        public void When_get_latest_version_of_migrations()
-        {
-            // Act
-            var version = _locator.GetLatestVersion(typeof(TestDocumentWithTwoMigration));
+        // Assert
+        version.Should().Be("0.0.2");
+    }
 
-            // Assert
-            version.Should().Be("0.0.2");
-        }
+    [Test]
+    public void When_get_migrations_gt_and_equal_version()
+    {
+        // Act
+        var result = _locator.GetMigrationsGtEq(typeof(TestDocumentWithTwoMigration), "0.0.1").ToList();
 
-        [Test]
-        public void When_get_migrations_gt_and_equal_version()
-        {
-            // Act
-            var result = _locator.GetMigrationsGtEq(typeof(TestDocumentWithTwoMigration), "0.0.1").ToList();
+        // Assert
+        result[0].Should().BeOfType<TestDocumentWithTwoMigration_0_0_1>();
+        result[1].Should().BeOfType<TestDocumentWithTwoMigration_0_0_2>();
+    }
 
-            // Assert
-            result[0].Should().BeOfType<TestDocumentWithTwoMigration_0_0_1>();
-            result[1].Should().BeOfType<TestDocumentWithTwoMigration_0_0_2>();
-        }
+    [Test]
+    public void When_get_migrations_gt_version()
+    {
+        // Act
+        var result = _locator.GetMigrationsGt(typeof(TestDocumentWithTwoMigration), "0.0.1").ToList();
 
-        [Test]
-        public void When_get_migrations_gt_version()
-        {
-            // Act
-            var result = _locator.GetMigrationsGt(typeof(TestDocumentWithTwoMigration), "0.0.1").ToList();
-
-            // Assert
-            result[0].Should().BeOfType<TestDocumentWithTwoMigration_0_0_2>();
-        }
+        // Assert
+        result[0].Should().BeOfType<TestDocumentWithTwoMigration_0_0_2>();
     }
 }
