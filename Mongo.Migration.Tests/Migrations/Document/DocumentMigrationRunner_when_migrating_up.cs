@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace Mongo.Migration.Tests.Migrations.Document;
 
 [TestFixture]
-internal class DocumentMigrationRunner_when_migrating_up : IntegrationTest
+internal class DocumentMigrationRunnerWhenMigratingUp : IntegrationTest
 {
     private IDocumentMigrationRunner _runner;
 

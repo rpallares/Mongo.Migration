@@ -3,9 +3,9 @@ using MongoDB.Driver;
 
 namespace Mongo.Migration.Tests.TestDoubles.Database;
 
-internal class TestDatabaseMigration_0_0_1 : DatabaseMigration
+internal class TestDatabaseMigration001 : DatabaseMigration
 {
-    public TestDatabaseMigration_0_0_1()
+    public TestDatabaseMigration001()
         : base("0.0.1")
     {
     }

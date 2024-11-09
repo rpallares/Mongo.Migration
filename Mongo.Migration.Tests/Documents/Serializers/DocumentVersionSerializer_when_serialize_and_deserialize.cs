@@ -9,7 +9,7 @@ using NUnit.Framework;
 namespace Mongo.Migration.Tests.Documents.Serializers;
 
 [TestFixture]
-public class DocumentVersionSerializer_when_serialize_and_deserialize
+public class DocumentVersionSerializerWhenSerializeAndDeserialize
 {
     private DocumentVersionSerializer _serializer;
 

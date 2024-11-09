@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace Mongo.Migration.Tests.MongoDB;
 
 [TestFixture]
-internal class MongoRegistrator_when_registrating : IntegrationTest
+internal class MongoRegistratorWhenRegistrating : IntegrationTest
 {
     [SetUp]
     public void SetUp()

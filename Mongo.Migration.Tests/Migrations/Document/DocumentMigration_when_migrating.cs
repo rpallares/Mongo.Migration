@@ -6,13 +6,13 @@ using NUnit.Framework;
 namespace Mongo.Migration.Tests.Migrations.Document;
 
 [TestFixture]
-public class DocumentMigration_when_migrating
+public class DocumentMigrationWhenMigrating
 {
     [Test]
     public void When_migrating_down_Then_document_changes()
     {
         // Arrange
-        var migration = new TestDocumentWithOneMigration_0_0_1();
+        var migration = new TestDocumentWithOneMigration001();
         var document = new BsonDocument { { "Doors", 3 } };
 
         // Act
@@ -26,7 +26,7 @@ public class DocumentMigration_when_migrating
     public void When_migrating_up_Then_document_changes()
     {
         // Arrange
-        var migration = new TestDocumentWithOneMigration_0_0_1();
+        var migration = new TestDocumentWithOneMigration001();
         var document = new BsonDocument { { "Dors", 3 } };
 
         // Act

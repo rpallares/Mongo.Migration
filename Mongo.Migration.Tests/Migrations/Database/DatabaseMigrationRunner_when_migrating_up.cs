@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace Mongo.Migration.Tests.Migrations.Database;
 
 [TestFixture]
-internal class DatabaseMigrationRunner_when_migrating_up : DatabaseIntegrationTest
+internal class DatabaseMigrationRunnerWhenMigratingUp : DatabaseIntegrationTest
 {
     private IDatabaseMigrationRunner _runner;
 
@@ -44,7 +44,7 @@ internal class DatabaseMigrationRunner_when_migrating_up : DatabaseIntegrationTe
     public void When_database_has_migrations_Then_latest_migrations_are_used()
     {
         // Arrange
-        InsertMigrations(new DatabaseMigration[] { new TestDatabaseMigration_0_0_1(), new TestDatabaseMigration_0_0_2() });
+        InsertMigrations(new DatabaseMigration[] { new TestDatabaseMigration001(), new TestDatabaseMigration002() });
 
         // Act
         _runner.Run(Db);
@@ -60,7 +60,7 @@ internal class DatabaseMigrationRunner_when_migrating_up : DatabaseIntegrationTe
     {
         // Arrange
         InsertMigrations(
-            new DatabaseMigration[] { new TestDatabaseMigration_0_0_1(), new TestDatabaseMigration_0_0_2(), new TestDatabaseMigration_0_0_3() });
+            new DatabaseMigration[] { new TestDatabaseMigration001(), new TestDatabaseMigration002(), new TestDatabaseMigration003() });
 
         // Act
         _runner.Run(Db);

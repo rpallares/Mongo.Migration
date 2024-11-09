@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace Mongo.Migration.Tests.Services.Interceptors;
 
 [TestFixture]
-internal class MigrationInterceptorFactory_when_creating : IntegrationTest
+internal class MigrationInterceptorFactoryWhenCreating : IntegrationTest
 {
     [SetUp]
     public void SetUp()

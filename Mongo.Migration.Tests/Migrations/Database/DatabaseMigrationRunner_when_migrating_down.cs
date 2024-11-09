@@ -34,9 +34,9 @@ internal class DatabaseMigrationRunnerWhenMigratingDown : DatabaseIntegrationTes
         InsertMigrations(
             new DatabaseMigration[]
             {
-                new TestDatabaseMigration_0_0_1(),
-                new TestDatabaseMigration_0_0_2(),
-                new TestDatabaseMigration_0_0_3()
+                new TestDatabaseMigration001(),
+                new TestDatabaseMigration002(),
+                new TestDatabaseMigration003()
             });
 
         // Act
@@ -56,9 +56,9 @@ internal class DatabaseMigrationRunnerWhenMigratingDown : DatabaseIntegrationTes
         InsertMigrations(
             new DatabaseMigration[]
             {
-                new TestDatabaseMigration_0_0_1(),
-                new TestDatabaseMigration_0_0_2(),
-                new TestDatabaseMigration_0_0_3()
+                new TestDatabaseMigration001(),
+                new TestDatabaseMigration002(),
+                new TestDatabaseMigration003()
             });
 
         // Act

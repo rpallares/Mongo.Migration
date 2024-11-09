@@ -17,13 +17,13 @@ namespace Mongo.Migration.Tests.Performance;
 [TestFixture]
 public class PerformanceTestOnStartup
 {
-    private const int DOCUMENT_COUNT = 10000;
+    private const int DocumentCount = 10000;
 
-    private const string DATABASE_NAME = "PerformanceTest";
+    private const string DatabaseName = "PerformanceTest";
 
-    private const string COLLECTION_NAME = "Test";
+    private const string CollectionName = "Test";
 
-    private const int TOLERANCE_MS = 2800;
+    private const int ToleranceMs = 2800;
 
     private MongoClient _client;
 
@@ -55,7 +55,7 @@ public class PerformanceTestOnStartup
 
         // Act
         // Measure time of MongoDb processing without Mongo.Migration
-        InsertMany(DOCUMENT_COUNT, false);
+        InsertMany(DocumentCount, false);
         var sw = new Stopwatch();
         sw.Start();
         MigrateAll(false);
@@ -64,7 +64,7 @@ public class PerformanceTestOnStartup
         ClearCollection();
 
         // Measure time of MongoDb processing without Mongo.Migration
-        InsertMany(DOCUMENT_COUNT, true);
+        InsertMany(DocumentCount, true);
         var swWithMigration = new Stopwatch();
         swWithMigration.Start();
         ServiceCollection serviceCollection = new();
@@ -81,10 +81,10 @@ public class PerformanceTestOnStartup
         var result = swWithMigration.ElapsedMilliseconds - sw.ElapsedMilliseconds;
 
         Console.WriteLine(
-            $"MongoDB: {sw.ElapsedMilliseconds}ms, Mongo.Migration: {swWithMigration.ElapsedMilliseconds}ms, Diff: {result}ms (Tolerance: {TOLERANCE_MS}ms), Documents: {DOCUMENT_COUNT}, Migrations per Document: 2");
+            $"MongoDB: {sw.ElapsedMilliseconds}ms, Mongo.Migration: {swWithMigration.ElapsedMilliseconds}ms, Diff: {result}ms (Tolerance: {ToleranceMs}ms), Documents: {DocumentCount}, Migrations per Document: 2");
 
         // Assert
-        result.Should().BeLessThan(TOLERANCE_MS);
+        result.Should().BeLessThan(ToleranceMs);
     }
 
     private void InsertMany(int number, bool withVersion)
@@ -104,7 +104,7 @@ public class PerformanceTestOnStartup
             documents.Add(document);
         }
 
-        _client.GetDatabase(DATABASE_NAME).GetCollection<BsonDocument>(COLLECTION_NAME).InsertManyAsync(documents)
+        _client.GetDatabase(DatabaseName).GetCollection<BsonDocument>(CollectionName).InsertManyAsync(documents)
             .Wait();
     }
 
@@ -112,25 +112,25 @@ public class PerformanceTestOnStartup
     {
         if (withVersion)
         {
-            var versionedCollectin = _client.GetDatabase(DATABASE_NAME)
-                .GetCollection<TestDocumentWithTwoMigrationHighestVersion>(COLLECTION_NAME);
+            var versionedCollectin = _client.GetDatabase(DatabaseName)
+                .GetCollection<TestDocumentWithTwoMigrationHighestVersion>(CollectionName);
             var versionedResult = versionedCollectin.FindAsync(_ => true).Result.ToListAsync().Result;
             return;
         }
 
-        var collection = _client.GetDatabase(DATABASE_NAME)
-            .GetCollection<TestClass>(COLLECTION_NAME);
+        var collection = _client.GetDatabase(DatabaseName)
+            .GetCollection<TestClass>(CollectionName);
         var result = collection.FindAsync(_ => true).Result.ToListAsync().Result;
     }
 
     private void AddDocumentsToCache()
     {
-        InsertMany(DOCUMENT_COUNT, false);
+        InsertMany(DocumentCount, false);
         MigrateAll(false);
     }
 
     private void ClearCollection()
     {
-        _client.GetDatabase(DATABASE_NAME).DropCollection(COLLECTION_NAME);
+        _client.GetDatabase(DatabaseName).DropCollection(CollectionName);
     }
 }

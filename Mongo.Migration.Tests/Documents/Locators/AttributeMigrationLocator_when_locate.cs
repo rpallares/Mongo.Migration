@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace Mongo.Migration.Tests.Documents.Locators;
 
 [TestFixture]
-internal class VersionLocator_when_locate
+internal class VersionLocatorWhenLocate
 {
     [Test]
     public void Then_find_current_version_of_document()

@@ -5,18 +5,18 @@ using NUnit.Framework;
 namespace Mongo.Migration.Tests.Documents;
 
 [TestFixture]
-public class DocumentVersion_When_compare
+public class DocumentVersionWhenCompare
 {
-    private readonly DocumentVersion equalLowerVersion = new("0.0.1");
+    private readonly DocumentVersion _equalLowerVersion = new("0.0.1");
 
-    private readonly DocumentVersion higherVersion = new("0.0.2");
+    private readonly DocumentVersion _higherVersion = new("0.0.2");
 
-    private readonly DocumentVersion lowerVersion = new("0.0.1");
+    private readonly DocumentVersion _lowerVersion = new("0.0.1");
 
     [Test]
     public void If_higherVersion_lte_equalLowerVersion_Then_false()
     {
-        bool result = higherVersion <= lowerVersion;
+        bool result = _higherVersion <= _lowerVersion;
 
         result.Should().BeFalse();
     }
@@ -24,7 +24,7 @@ public class DocumentVersion_When_compare
     [Test]
     public void If_lowerVersion_gt_higherVersion_Then_false()
     {
-        bool result = lowerVersion > higherVersion;
+        bool result = _lowerVersion > _higherVersion;
 
         result.Should().BeFalse();
     }
@@ -32,7 +32,7 @@ public class DocumentVersion_When_compare
     [Test]
     public void If_lowerVersion_gte_equalLowerVersion_Then_true()
     {
-        bool result = lowerVersion >= equalLowerVersion;
+        bool result = _lowerVersion >= _equalLowerVersion;
 
         result.Should().BeTrue();
     }
@@ -40,7 +40,7 @@ public class DocumentVersion_When_compare
     [Test]
     public void If_lowerVersion_gte_higherVersion_Then_false()
     {
-        bool result = lowerVersion >= higherVersion;
+        bool result = _lowerVersion >= _higherVersion;
 
         result.Should().BeFalse();
     }
@@ -48,7 +48,7 @@ public class DocumentVersion_When_compare
     [Test]
     public void If_lowerVersion_lt_higherVersion_Then_true()
     {
-        bool result = lowerVersion < higherVersion;
+        bool result = _lowerVersion < _higherVersion;
 
         result.Should().BeTrue();
     }
@@ -56,7 +56,7 @@ public class DocumentVersion_When_compare
     [Test]
     public void If_lowerVersion_lte_equalLowerVersion_Then_true()
     {
-        bool result = lowerVersion <= equalLowerVersion;
+        bool result = _lowerVersion <= _equalLowerVersion;
 
         result.Should().BeTrue();
     }

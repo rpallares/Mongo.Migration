@@ -55,8 +55,8 @@ public class TypeMigrationLocatorWhenLocate
         var result = _locator.GetMigrationsGtEq(typeof(TestDocumentWithTwoMigration), "0.0.1").ToList();
 
         // Assert
-        result[0].Should().BeOfType<TestDocumentWithTwoMigration_0_0_1>();
-        result[1].Should().BeOfType<TestDocumentWithTwoMigration_0_0_2>();
+        result[0].Should().BeOfType<TestDocumentWithTwoMigration001>();
+        result[1].Should().BeOfType<TestDocumentWithTwoMigration002>();
     }
 
     [Test]
@@ -66,6 +66,6 @@ public class TypeMigrationLocatorWhenLocate
         var result = _locator.GetMigrationsGt(typeof(TestDocumentWithTwoMigration), "0.0.1").ToList();
 
         // Assert
-        result[0].Should().BeOfType<TestDocumentWithTwoMigration_0_0_2>();
+        result[0].Should().BeOfType<TestDocumentWithTwoMigration002>();
     }
 }

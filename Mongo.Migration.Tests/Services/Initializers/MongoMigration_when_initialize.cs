@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace Mongo.Migration.Tests.Services.Initializers;
 
 [TestFixture]
-public class MongoMigration_when_initialize
+public class MongoMigrationWhenInitialize
 {
     [TearDown]
     public void TearDown()

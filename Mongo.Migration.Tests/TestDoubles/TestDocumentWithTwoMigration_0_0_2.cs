@@ -3,9 +3,9 @@ using MongoDB.Bson;
 
 namespace Mongo.Migration.Tests.TestDoubles;
 
-internal class TestDocumentWithTwoMigration_0_0_2 : DocumentMigration<TestDocumentWithTwoMigration>
+internal class TestDocumentWithTwoMigration002 : DocumentMigration<TestDocumentWithTwoMigration>
 {
-    public TestDocumentWithTwoMigration_0_0_2()
+    public TestDocumentWithTwoMigration002()
         : base("0.0.2")
     {
     }

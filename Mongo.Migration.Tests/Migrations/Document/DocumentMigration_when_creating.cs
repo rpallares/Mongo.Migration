@@ -5,13 +5,13 @@ using NUnit.Framework;
 namespace Mongo.Migration.Tests.Migrations.Document;
 
 [TestFixture]
-public class DocumentMigration_when_creating
+public class DocumentMigrationWhenCreating
 {
     [Test]
     public void Then_migration_has_type_testClass()
     {
         // Arrange Act
-        var migration = new TestDocumentWithOneMigration_0_0_1();
+        var migration = new TestDocumentWithOneMigration001();
 
         // Assert
         migration.Type.Should().Be(typeof(TestDocumentWithOneMigration));
@@ -21,7 +21,7 @@ public class DocumentMigration_when_creating
     public void Then_migration_have_version()
     {
         // Arrange Act
-        var migration = new TestDocumentWithOneMigration_0_0_1();
+        var migration = new TestDocumentWithOneMigration001();
 
         // Assert
         migration.Version.Should().Be("0.0.1");
@@ -31,9 +31,9 @@ public class DocumentMigration_when_creating
     public void Then_migration_should_be_created()
     {
         // Arrange Act
-        var migration = new TestDocumentWithOneMigration_0_0_1();
+        var migration = new TestDocumentWithOneMigration001();
 
         // Assert
-        migration.Should().BeOfType<TestDocumentWithOneMigration_0_0_1>();
+        migration.Should().BeOfType<TestDocumentWithOneMigration001>();
     }
 }
