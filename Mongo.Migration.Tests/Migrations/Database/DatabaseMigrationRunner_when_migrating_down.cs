@@ -10,25 +10,11 @@ namespace Mongo.Migration.Tests.Migrations.Database;
 [TestFixture]
 internal class DatabaseMigrationRunnerWhenMigratingDown : DatabaseIntegrationTest
 {
-    private IDatabaseMigrationRunner? _runner;
-
-    protected override void OnSetUp(DocumentVersion databaseMigrationVersion)
-    {
-        base.OnSetUp(databaseMigrationVersion);
-
-        _runner = Provider.GetRequiredService<IDatabaseMigrationRunner>();
-    }
-
-    [TearDown]
-    public void TearDown()
-    {
-        Dispose();
-    }
-
     [Test]
-    public void When_database_has_migrations_Then_down_all_migrations()
+    public async Task When_database_has_migrations_Then_down_all_migrations()
     {
-        OnSetUp(DocumentVersion.Default());
+        await OnSetUpAsync(DocumentVersion.Default());
+        IDatabaseMigrationRunner runner = Provider.GetRequiredService<IDatabaseMigrationRunner>();
 
         // Arrange
         InsertMigrations(
@@ -40,7 +26,7 @@ internal class DatabaseMigrationRunnerWhenMigratingDown : DatabaseIntegrationTes
             });
 
         // Act
-        _runner?.Run(Db);
+        runner.Run(Db);
 
         // Assert
         var migrations = GetMigrationHistory();
@@ -48,9 +34,10 @@ internal class DatabaseMigrationRunnerWhenMigratingDown : DatabaseIntegrationTes
     }
 
     [Test]
-    public void When_database_has_migrations_Then_down_to_selected_migration()
+    public async Task When_database_has_migrations_Then_down_to_selected_migration()
     {
-        OnSetUp(new("0.0.1"));
+        await OnSetUpAsync(new("0.0.1"));
+        IDatabaseMigrationRunner runner = Provider.GetRequiredService<IDatabaseMigrationRunner>();
 
         // Arrange
         InsertMigrations(
@@ -62,7 +49,7 @@ internal class DatabaseMigrationRunnerWhenMigratingDown : DatabaseIntegrationTes
             });
 
         // Act
-        _runner?.Run(Db);
+        runner.Run(Db);
 
         // Assert
         var migrations = GetMigrationHistory();

@@ -10,27 +10,15 @@ namespace Mongo.Migration.Tests.Migrations.Database;
 [TestFixture]
 internal class DatabaseMigrationRunnerWhenMigratingUp : DatabaseIntegrationTest
 {
-    private IDatabaseMigrationRunner _runner;
-
-    [SetUp]
-    public void SetUp()
-    {
-        base.OnSetUp(DocumentVersion.Empty());
-
-        _runner = Provider.GetRequiredService<IDatabaseMigrationRunner>();
-    }
-
-    [TearDown]
-    public void TearDown()
-    {
-        Dispose();
-    }
-
     [Test]
-    public void When_database_has_no_migrations_Then_all_migrations_are_used()
+    public async Task When_database_has_no_migrations_Then_all_migrations_are_used()
     {
+        // Arrange
+        await OnSetUpAsync(DocumentVersion.Empty());
+        IDatabaseMigrationRunner runner = Provider.GetRequiredService<IDatabaseMigrationRunner>();
+
         // Act
-        _runner.Run(Db);
+        runner.Run(Db);
 
         // Assert
         var migrations = GetMigrationHistory();
@@ -41,13 +29,15 @@ internal class DatabaseMigrationRunnerWhenMigratingUp : DatabaseIntegrationTest
     }
 
     [Test]
-    public void When_database_has_migrations_Then_latest_migrations_are_used()
+    public async Task When_database_has_migrations_Then_latest_migrations_are_used()
     {
         // Arrange
+        await OnSetUpAsync(DocumentVersion.Empty());
+        IDatabaseMigrationRunner runner = Provider.GetRequiredService<IDatabaseMigrationRunner>();
         InsertMigrations(new DatabaseMigration[] { new TestDatabaseMigration001(), new TestDatabaseMigration002() });
 
         // Act
-        _runner.Run(Db);
+        runner.Run(Db);
 
         // Assert
         var migrations = GetMigrationHistory();
@@ -56,14 +46,15 @@ internal class DatabaseMigrationRunnerWhenMigratingUp : DatabaseIntegrationTest
     }
 
     [Test]
-    public void When_database_has_latest_version_Then_nothing_happens()
+    public async Task When_database_has_latest_version_Then_nothing_happens()
     {
         // Arrange
-        InsertMigrations(
-            new DatabaseMigration[] { new TestDatabaseMigration001(), new TestDatabaseMigration002(), new TestDatabaseMigration003() });
+        await OnSetUpAsync(DocumentVersion.Empty());
+        IDatabaseMigrationRunner runner = Provider.GetRequiredService<IDatabaseMigrationRunner>();
+        InsertMigrations(new DatabaseMigration[] { new TestDatabaseMigration001(), new TestDatabaseMigration002(), new TestDatabaseMigration003() });
 
         // Act
-        _runner.Run(Db);
+        runner.Run(Db);
 
         // Assert
         var migrations = GetMigrationHistory();

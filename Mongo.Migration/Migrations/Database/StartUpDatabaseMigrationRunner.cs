@@ -22,24 +22,14 @@ internal class StartUpDatabaseMigrationRunner : IStartUpDatabaseMigrationRunner
         ICollectionLocator collectionLocator,
         IDatabaseMigrationRunner migrationRunner)
         : this(
+            settings.ClientSettings != null
+                ? new MongoClient(settings.ClientSettings)
+                : new MongoClient(settings.ConnectionString),
+            settings.Database,
             collectionLocator,
             migrationRunner)
     {
-        if (settings.ConnectionString == null && settings.Database == null || settings.ClientSettings == null)
-        {
-            throw new MongoMigrationNoMongoClientException();
-        }
 
-        if (settings.ClientSettings != null)
-        {
-            _client = new MongoClient(settings.ClientSettings);
-        }
-        else
-        {
-            _client = new MongoClient(settings.ConnectionString);
-        }
-
-        _databaseName = settings.Database;
     }
 
     public StartUpDatabaseMigrationRunner(
@@ -47,24 +37,19 @@ internal class StartUpDatabaseMigrationRunner : IStartUpDatabaseMigrationRunner
         IMongoMigrationSettings settings,
         ICollectionLocator collectionLocator,
         IDatabaseMigrationRunner migrationRunner)
-        : this(
-            collectionLocator,
-            migrationRunner)
+        : this(client, settings.Database, collectionLocator, migrationRunner)
     {
-        _client = client;
-        if (settings.ConnectionString == null && settings.Database == null)
-        {
-            return;
-        }
 
-        _client = new MongoClient(settings.ConnectionString);
-        _databaseName = settings.Database;
     }
 
     private StartUpDatabaseMigrationRunner(
+        IMongoClient client,
+        string databaseName,
         ICollectionLocator collectionLocator,
         IDatabaseMigrationRunner migrationRunner)
     {
+        _client = client;
+        _databaseName = databaseName;
         _collectionLocator = collectionLocator;
         _migrationRunner = migrationRunner;
     }

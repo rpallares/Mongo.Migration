@@ -6,13 +6,13 @@ namespace Mongo.Migration.Startup;
 
 public interface IMongoMigrationSettings
 {
-    string ConnectionString { get; set; }
+    string? ConnectionString { get; set; }
 
-    string Database { get; set; }
+    string? Database { get; set; }
 
     DocumentVersion DatabaseMigrationVersion { get; set; }
 
     string VersionFieldName { get; set; }
 
-    MongoClientSettings ClientSettings { get; set; }
+    MongoClientSettings? ClientSettings { get; set; }
 }

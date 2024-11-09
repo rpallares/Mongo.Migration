@@ -7,7 +7,6 @@ using Mongo.Migration.Startup;
 using Mongo.Migration.Startup.DotNetCore;
 using Mongo.Migration.Startup.Static;
 using Mongo.Migration.Tests.TestDoubles;
-using Mongo2Go;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using NUnit.Framework;
@@ -25,23 +24,10 @@ public class PerformanceTestOnStartup
 
     private const int ToleranceMs = 2800;
 
-    private MongoClient _client;
-
-    private MongoDbRunner _runner;
-
     [TearDown]
     public void TearDown()
     {
         MongoMigrationClient.Reset();
-        _client = null!;
-        _runner.Dispose();
-    }
-
-    [SetUp]
-    public void SetUp()
-    {
-        _runner = MongoDbRunner.Start();
-        _client = new(_runner.ConnectionString);
     }
 
     [Test]
@@ -63,14 +49,15 @@ public class PerformanceTestOnStartup
 
         ClearCollection();
 
-        // Measure time of MongoDb processing without Mongo.Migration
+        // Measure time of MongoDb processing with Mongo.Migration
+        IMongoClient client = TestcontainersContext.MongoClient;
         InsertMany(DocumentCount, true);
         var swWithMigration = new Stopwatch();
         swWithMigration.Start();
         ServiceCollection serviceCollection = new();
         serviceCollection
             .AddLogging(l => l.AddProvider(NullLoggerProvider.Instance))
-            .AddSingleton<IMongoClient>(_client)
+            .AddSingleton<IMongoClient>(client)
             .AddMigration(new MongoMigrationSettings());
         ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
         MongoMigrationClient.Initialize(serviceProvider);
@@ -104,21 +91,25 @@ public class PerformanceTestOnStartup
             documents.Add(document);
         }
 
-        _client.GetDatabase(DatabaseName).GetCollection<BsonDocument>(CollectionName).InsertManyAsync(documents)
+        TestcontainersContext.MongoClient
+            .GetDatabase(DatabaseName)
+            .GetCollection<BsonDocument>(CollectionName)
+            .InsertManyAsync(documents)
             .Wait();
     }
 
     private void MigrateAll(bool withVersion)
     {
+        IMongoClient client = TestcontainersContext.MongoClient;
+
         if (withVersion)
         {
-            var versionedCollectin = _client.GetDatabase(DatabaseName)
+            var versionedCollection = client.GetDatabase(DatabaseName)
                 .GetCollection<TestDocumentWithTwoMigrationHighestVersion>(CollectionName);
-            var versionedResult = versionedCollectin.FindAsync(_ => true).Result.ToListAsync().Result;
+            var versionedResult = versionedCollection.FindAsync(_ => true).Result.ToListAsync().Result;
             return;
         }
-
-        var collection = _client.GetDatabase(DatabaseName)
+        var collection = client.GetDatabase(DatabaseName)
             .GetCollection<TestClass>(CollectionName);
         var result = collection.FindAsync(_ => true).Result.ToListAsync().Result;
     }
@@ -131,6 +122,8 @@ public class PerformanceTestOnStartup
 
     private void ClearCollection()
     {
-        _client.GetDatabase(DatabaseName).DropCollection(CollectionName);
+        TestcontainersContext.MongoClient
+            .GetDatabase(DatabaseName)
+            .DropCollection(CollectionName);
     }
 }

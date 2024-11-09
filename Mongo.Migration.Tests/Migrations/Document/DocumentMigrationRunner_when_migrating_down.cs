@@ -10,26 +10,11 @@ namespace Mongo.Migration.Tests.Migrations.Document;
 [TestFixture]
 internal class DocumentMigrationRunnerWhenMigratingDown : IntegrationTest
 {
-    private IDocumentMigrationRunner _runner;
-
-    [SetUp]
-    public void SetUp()
-    {
-        OnSetUp();
-
-        _runner = Provider.GetRequiredService<IDocumentMigrationRunner>();
-    }
-
-    [TearDown]
-    public void TearDown()
-    {
-        Dispose();
-    }
-
     [Test]
     public void When_migrating_down_Then_all_migrations_are_used()
     {
         // Arrange
+        IDocumentMigrationRunner runner = Provider.GetRequiredService<IDocumentMigrationRunner>();
         BsonDocument document = new()
         {
             { "Version", "0.0.2" },
@@ -37,7 +22,7 @@ internal class DocumentMigrationRunnerWhenMigratingDown : IntegrationTest
         };
 
         // Act
-        _runner.Run(typeof(TestDocumentWithTwoMigration), document);
+        runner.Run(typeof(TestDocumentWithTwoMigration), document);
 
         // Assert
         document.Names.ToList()[1].Should().Be("Dors");
@@ -48,7 +33,7 @@ internal class DocumentMigrationRunnerWhenMigratingDown : IntegrationTest
     public void When_document_has_Then_all_migrations_are_used_to_that_version()
     {
         // Arrange
-        // Arrange
+        IDocumentMigrationRunner runner = Provider.GetRequiredService<IDocumentMigrationRunner>();
         BsonDocument document = new()
         {
             { "Version", "0.0.2" },
@@ -56,7 +41,7 @@ internal class DocumentMigrationRunnerWhenMigratingDown : IntegrationTest
         };
 
         // Act
-        _runner.Run(typeof(TestDocumentWithTwoMigrationMiddleVersion), document);
+        runner.Run(typeof(TestDocumentWithTwoMigrationMiddleVersion), document);
 
         // Assert
         document.Names.ToList()[1].Should().Be("Doors");

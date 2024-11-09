@@ -10,26 +10,11 @@ namespace Mongo.Migration.Tests.Migrations.Document;
 [TestFixture]
 internal class DocumentMigrationRunnerWhenMigratingUp : IntegrationTest
 {
-    private IDocumentMigrationRunner _runner;
-
-    [SetUp]
-    public void SetUp()
-    {
-        OnSetUp();
-
-        _runner = Provider.GetRequiredService<IDocumentMigrationRunner>();
-    }
-
-    [TearDown]
-    public void TearDown()
-    {
-        Dispose();
-    }
-
     [Test]
     public void When_migrate_up_the_lowest_version_Then_all_migrations_are_used()
     {
         // Arrange
+        IDocumentMigrationRunner runner = Provider.GetRequiredService<IDocumentMigrationRunner>();
         BsonDocument document = new()
         {
             { "Version", "0.0.0" },
@@ -37,7 +22,7 @@ internal class DocumentMigrationRunnerWhenMigratingUp : IntegrationTest
         };
 
         // Act
-        _runner.Run(typeof(TestDocumentWithTwoMigrationHighestVersion), document);
+        runner.Run(typeof(TestDocumentWithTwoMigrationHighestVersion), document);
 
         // Assert
         document.Names.ToList()[1].Should().Be("Door");
@@ -48,13 +33,14 @@ internal class DocumentMigrationRunnerWhenMigratingUp : IntegrationTest
     public void When_document_has_no_version_Then_all_migrations_are_used()
     {
         // Arrange
+        IDocumentMigrationRunner runner = Provider.GetRequiredService<IDocumentMigrationRunner>();
         BsonDocument document = new()
         {
             { "Dors", 3 }
         };
 
         // Act
-        _runner.Run(typeof(TestDocumentWithTwoMigrationHighestVersion), document);
+        runner.Run(typeof(TestDocumentWithTwoMigrationHighestVersion), document);
 
         // Assert
         document.Names.ToList()[1].Should().Be("Door");
@@ -65,6 +51,7 @@ internal class DocumentMigrationRunnerWhenMigratingUp : IntegrationTest
     public void When_document_has_current_version_Then_nothing_happens()
     {
         // Arrange
+        IDocumentMigrationRunner runner = Provider.GetRequiredService<IDocumentMigrationRunner>();
         BsonDocument document = new()
         {
             { "Version", "0.0.2" },
@@ -72,7 +59,7 @@ internal class DocumentMigrationRunnerWhenMigratingUp : IntegrationTest
         };
 
         // Act
-        _runner.Run(typeof(TestDocumentWithTwoMigrationHighestVersion), document);
+        runner.Run(typeof(TestDocumentWithTwoMigrationHighestVersion), document);
 
         // Assert
         document.Names.ToList()[1].Should().Be("Door");

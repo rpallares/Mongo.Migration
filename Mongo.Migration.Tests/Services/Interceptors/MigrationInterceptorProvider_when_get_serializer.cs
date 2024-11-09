@@ -9,18 +9,6 @@ namespace Mongo.Migration.Tests.Services.Interceptors;
 [TestFixture]
 internal class MigrationInterceptorProviderWhenGetSerializer : IntegrationTest
 {
-    [SetUp]
-    public void SetUp()
-    {
-        OnSetUp();
-    }
-
-    [TearDown]
-    public void TearDown()
-    {
-        Dispose();
-    }
-
     [Test]
     public void When_entity_is_document_Then_provide_serializer()
     {

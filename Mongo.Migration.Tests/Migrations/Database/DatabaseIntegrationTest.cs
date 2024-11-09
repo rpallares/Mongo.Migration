@@ -5,17 +5,16 @@ using Mongo.Migration.Documents;
 using Mongo.Migration.Migrations.Database;
 using Mongo.Migration.Startup;
 using Mongo.Migration.Startup.DotNetCore;
-using Mongo2Go;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using NUnit.Framework;
 
 namespace Mongo.Migration.Tests.Migrations.Database;
 
-internal class DatabaseIntegrationTest : IDisposable
+[TestFixture]
+internal class DatabaseIntegrationTest
 {
     private const string MigrationsCollectionName = "_migrations";
-
-    private MongoClient? _client;
 
     private ServiceProvider? _serviceProvider;
     protected IServiceProvider Provider => _serviceProvider ?? throw new InvalidOperationException("Must be setup");
@@ -23,38 +22,40 @@ internal class DatabaseIntegrationTest : IDisposable
     private IMongoDatabase? _db;
     protected IMongoDatabase Db => _db ?? throw new InvalidOperationException("Must be setup");
 
-    private MongoDbRunner? _mongoToGoRunner;
-
     protected virtual string DatabaseName { get; set; } = "DatabaseMigration";
 
     protected virtual string CollectionName { get; set; } = "Test";
-
-    public void Dispose()
+    
+    protected async Task OnSetUpAsync(DocumentVersion databaseMigrationVersion)
     {
-        _serviceProvider?.Dispose();
-        _mongoToGoRunner?.Dispose();
-    }
-
-    protected virtual void OnSetUp(DocumentVersion databaseMigrationVersion)
-    {
-        _mongoToGoRunner = MongoDbRunner.Start();
-        _client = new MongoClient(_mongoToGoRunner.ConnectionString);
-        _db = _client.GetDatabase(DatabaseName);
-        _db.CreateCollection(CollectionName);
-
+        IMongoClient client = TestcontainersContext.MongoClient;
+        _db = client.GetDatabase(DatabaseName);
+        await _db.CreateCollectionAsync(CollectionName);
 
         ServiceCollection serviceCollection = new();
         serviceCollection
             .AddLogging(l => l.AddProvider(NullLoggerProvider.Instance))
-            .AddSingleton<IMongoClient>(_client)
+            .AddSingleton<IMongoClient>(client)
             .AddMigration(new MongoMigrationSettings
             {
-                ConnectionString = _mongoToGoRunner.ConnectionString,
                 Database = DatabaseName,
                 DatabaseMigrationVersion = databaseMigrationVersion
             });
 
         _serviceProvider = serviceCollection.BuildServiceProvider();
+    }
+
+    [TearDown]
+    public async Task TearDownAsync()
+    {
+        if (_serviceProvider is not null)
+        {
+            await _serviceProvider.DisposeAsync();
+        }
+        IMongoClient client = TestcontainersContext.MongoClient;
+        IMongoDatabase database = client.GetDatabase(DatabaseName);
+        await database.DropCollectionAsync(CollectionName);
+        await database.DropCollectionAsync(MigrationsCollectionName);
     }
 
     protected void InsertMigrations(IEnumerable<DatabaseMigration> migrations)

@@ -3,41 +3,44 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Mongo.Migration.Startup;
 using Mongo.Migration.Startup.DotNetCore;
-using Mongo2Go;
 using MongoDB.Driver;
+using NUnit.Framework;
 
 namespace Mongo.Migration.Tests;
 
-public class IntegrationTest : IDisposable
+[TestFixture]
+public class IntegrationTest
 {
-    private MongoClient? _client;
-
-    private MongoDbRunner? _mongoToGoRunner;
-
+    private const string DatabaseName = "PerformanceTest";
+    private const string CollectionName = "Test";
     private ServiceProvider? _serviceProvider;
 
     protected IServiceProvider Provider => _serviceProvider ?? throw new InvalidOperationException("Must be setup");
 
-    public void Dispose()
+    [SetUp]
+    protected async Task SetUpAsync()
     {
-        _serviceProvider?.Dispose();
-        _mongoToGoRunner?.Dispose();
-        GC.SuppressFinalize(this);
-    }
-
-    protected void OnSetUp()
-    {
-        _mongoToGoRunner = MongoDbRunner.Start();
-        _client = new MongoClient(_mongoToGoRunner.ConnectionString);
-
-        _client.GetDatabase("PerformanceTest").CreateCollection("Test");
+        IMongoClient client = TestcontainersContext.MongoClient;
+        await client.GetDatabase(DatabaseName).CreateCollectionAsync(CollectionName);
 
         ServiceCollection serviceCollection = new();
         serviceCollection
             .AddLogging(l => l.AddProvider(NullLoggerProvider.Instance))
-            .AddSingleton<IMongoClient>(_client)
-            .AddMigration(new MongoMigrationSettings { ConnectionString = _mongoToGoRunner.ConnectionString, Database = "PerformanceTest" });
+            .AddSingleton<IMongoClient>(client)
+            .AddMigration(new MongoMigrationSettings { Database = DatabaseName });
 
         _serviceProvider = serviceCollection.BuildServiceProvider();
+    }
+
+    [TearDown]
+    protected async Task TearDownAsync()
+    {
+        if (_serviceProvider is not null)
+        {
+            await _serviceProvider.DisposeAsync();
+        }
+        IMongoClient client = TestcontainersContext.MongoClient;
+        await client.GetDatabase(DatabaseName)
+            .DropCollectionAsync(CollectionName);
     }
 }

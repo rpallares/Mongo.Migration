@@ -9,18 +9,6 @@ namespace Mongo.Migration.Tests.Services.Interceptors;
 [TestFixture]
 internal class MigrationInterceptorFactoryWhenCreating : IntegrationTest
 {
-    [SetUp]
-    public void SetUp()
-    {
-        OnSetUp();
-    }
-
-    [TearDown]
-    public void TearDown()
-    {
-        Dispose();
-    }
-
     [Test]
     public void If_type_is_assignable_to_document_Then_interceptor_is_created()
     {
