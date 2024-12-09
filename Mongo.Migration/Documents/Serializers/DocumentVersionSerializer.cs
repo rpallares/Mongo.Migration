@@ -3,20 +3,19 @@ using MongoDB.Bson.Serialization.Serializers;
 
 namespace Mongo.Migration.Documents.Serializers;
 
-public class DocumentVersionSerializer : SerializerBase<DocumentVersion>
+public sealed class DocumentVersionSerializer : SerializerBase<DocumentVersion>
 {
     public override void Serialize(
         BsonSerializationContext context,
-        BsonSerializationArgs args,
+        BsonSerializationArgs _,
         DocumentVersion value)
     {
-        var versionString = $"{value.Major}.{value.Minor}.{value.Revision}";
-        context.Writer.WriteString(versionString);
+        context.Writer.WriteString(value.ToString());
     }
 
-    public override DocumentVersion Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+    public override DocumentVersion Deserialize(BsonDeserializationContext context, BsonDeserializationArgs _)
     {
         var versionString = context.Reader.ReadString();
-        return new(versionString);
+        return DocumentVersion.Parse(versionString.AsSpan());
     }
 }

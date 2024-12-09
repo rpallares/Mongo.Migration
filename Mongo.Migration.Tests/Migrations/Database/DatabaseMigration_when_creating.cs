@@ -25,7 +25,7 @@ public class DatabaseMigrationWhenCreating
         var migration = new TestDatabaseMigration001();
 
         // Assert
-        migration.Version.Should().Be("0.0.1");
+        migration.Version.ToString().Should().Be("0.0.1");
     }
 
     [Test]

@@ -1,10 +1,12 @@
 ﻿using Mongo.Migration.Documents;
 using Mongo.Migration.Documents.Attributes;
+using MongoDB.Bson;
 
 namespace Mongo.Migration.Tests.TestDoubles;
 
 [RuntimeVersion("0.0.1")]
 internal class TestDocumentWithTwoMigrationMiddleVersion : Document
 {
-    public int Door { get; set; }
+    public ObjectId Id { get; set; }
+    public int Doors1 { get; set; }
 }

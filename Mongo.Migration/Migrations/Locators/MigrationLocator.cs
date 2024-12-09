@@ -88,7 +88,7 @@ public abstract class MigrationLocator<TMigrationType> : IMigrationLocator<TMigr
 
         return migrations.Count > 0
             ? migrations.Max(m => m.Version)
-            : DocumentVersion.Default();
+            : DocumentVersion.Default;
     }
 
     public abstract void Locate();

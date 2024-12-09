@@ -1,10 +1,5 @@
-﻿using Mongo.Migration.Documents.Locators;
-using Mongo.Migration.Migrations.Document;
-using Mongo.Migration.Migrations.Locators;
-using Mongo.Migration.Services;
-
-namespace Mongo.Migration;
-
+﻿namespace Mongo.Migration;
+/*
 internal class MongoMigration : IMongoMigration
 {
     private readonly ICollectionLocator _collectionLocator;
@@ -46,3 +41,4 @@ internal class MongoMigration : IMongoMigration
         _migrationService.Migrate();
     }
 }
+*/

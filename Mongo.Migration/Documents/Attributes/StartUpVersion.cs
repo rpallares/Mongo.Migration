@@ -7,6 +7,6 @@ public class StartUpVersion : Attribute
 
     public StartUpVersion(string version)
     {
-        Version = version;
+        Version = DocumentVersion.Parse(version.AsSpan());
     }
 }

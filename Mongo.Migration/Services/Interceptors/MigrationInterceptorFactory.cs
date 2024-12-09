@@ -23,4 +23,8 @@ internal class MigrationInterceptorFactory : IMigrationInterceptorFactory
         return interceptor as IBsonSerializer
                ?? throw new InvalidOperationException($"Cannot create {genericType} interceptor");
     }
+
+    public IDocumentVersionService DocumentVersionService => _documentVersionService;
+    
+    public IDocumentMigrationRunner MigrationRunner => _migrationRunner;
 }

@@ -4,7 +4,7 @@ using MongoDB.Bson;
 
 namespace Mongo.Migration.Migrations.Document;
 
-internal interface IDocumentMigrationRunner
+public interface IDocumentMigrationRunner
 {
     void Run(Type type, BsonDocument document, DocumentVersion to);
 

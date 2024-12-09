@@ -1,6 +1,6 @@
 ﻿namespace Mongo.Migration;
 
-public interface IMongoMigration
+public interface IMongoMigrationBak
 {
     void Run();
 }

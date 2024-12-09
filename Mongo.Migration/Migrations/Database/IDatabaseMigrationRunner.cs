@@ -1,8 +1,9 @@
-﻿using MongoDB.Driver;
+﻿using Mongo.Migration.Documents;
+using MongoDB.Driver;
 
 namespace Mongo.Migration.Migrations.Database;
 
-internal interface IDatabaseMigrationRunner
+public interface IDatabaseMigrationRunner
 {
-    void Run(IMongoDatabase db);
+    void Run(IMongoDatabase db, DocumentVersion? targetVersion = null);
 }

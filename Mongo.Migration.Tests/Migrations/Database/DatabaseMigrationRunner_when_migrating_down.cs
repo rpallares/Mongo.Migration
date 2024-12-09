@@ -13,8 +13,8 @@ internal class DatabaseMigrationRunnerWhenMigratingDown : DatabaseIntegrationTes
     [Test]
     public async Task When_database_has_migrations_Then_down_all_migrations()
     {
-        await OnSetUpAsync(DocumentVersion.Default());
-        IDatabaseMigrationRunner runner = Provider.GetRequiredService<IDatabaseMigrationRunner>();
+        await OnSetUpAsync();
+        IDatabaseMigrationRunner runner = TestcontainersContext.Provider.GetRequiredService<IDatabaseMigrationRunner>();
 
         // Arrange
         InsertMigrations(
@@ -26,7 +26,7 @@ internal class DatabaseMigrationRunnerWhenMigratingDown : DatabaseIntegrationTes
             });
 
         // Act
-        runner.Run(Db);
+        runner.Run(Db, DocumentVersion.Default);
 
         // Assert
         var migrations = GetMigrationHistory();
@@ -36,8 +36,8 @@ internal class DatabaseMigrationRunnerWhenMigratingDown : DatabaseIntegrationTes
     [Test]
     public async Task When_database_has_migrations_Then_down_to_selected_migration()
     {
-        await OnSetUpAsync(new("0.0.1"));
-        IDatabaseMigrationRunner runner = Provider.GetRequiredService<IDatabaseMigrationRunner>();
+        await OnSetUpAsync();
+        IDatabaseMigrationRunner runner = TestcontainersContext.Provider.GetRequiredService<IDatabaseMigrationRunner>();
 
         // Arrange
         InsertMigrations(
@@ -49,11 +49,11 @@ internal class DatabaseMigrationRunnerWhenMigratingDown : DatabaseIntegrationTes
             });
 
         // Act
-        runner.Run(Db);
+        runner.Run(Db, new DocumentVersion(0, 0, 1));
 
         // Assert
         var migrations = GetMigrationHistory();
         migrations.Should().NotBeEmpty();
-        migrations.Should().OnlyContain(m => m.Version == "0.0.1");
+        migrations.Should().OnlyContain(m => m.Version == new DocumentVersion(0, 0, 1));
     }
 }

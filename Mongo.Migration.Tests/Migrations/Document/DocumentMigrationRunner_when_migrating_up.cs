@@ -14,7 +14,7 @@ internal class DocumentMigrationRunnerWhenMigratingUp : IntegrationTest
     public void When_migrate_up_the_lowest_version_Then_all_migrations_are_used()
     {
         // Arrange
-        IDocumentMigrationRunner runner = Provider.GetRequiredService<IDocumentMigrationRunner>();
+        IDocumentMigrationRunner runner = TestcontainersContext.Provider.GetRequiredService<IDocumentMigrationRunner>();
         BsonDocument document = new()
         {
             { "Version", "0.0.0" },
@@ -33,7 +33,7 @@ internal class DocumentMigrationRunnerWhenMigratingUp : IntegrationTest
     public void When_document_has_no_version_Then_all_migrations_are_used()
     {
         // Arrange
-        IDocumentMigrationRunner runner = Provider.GetRequiredService<IDocumentMigrationRunner>();
+        IDocumentMigrationRunner runner = TestcontainersContext.Provider.GetRequiredService<IDocumentMigrationRunner>();
         BsonDocument document = new()
         {
             { "Dors", 3 }
@@ -51,7 +51,7 @@ internal class DocumentMigrationRunnerWhenMigratingUp : IntegrationTest
     public void When_document_has_current_version_Then_nothing_happens()
     {
         // Arrange
-        IDocumentMigrationRunner runner = Provider.GetRequiredService<IDocumentMigrationRunner>();
+        IDocumentMigrationRunner runner = TestcontainersContext.Provider.GetRequiredService<IDocumentMigrationRunner>();
         BsonDocument document = new()
         {
             { "Version", "0.0.2" },

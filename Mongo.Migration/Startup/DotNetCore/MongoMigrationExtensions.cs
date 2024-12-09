@@ -1,47 +1,28 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-
-using Mongo.Migration.Documents.Locators;
-using Mongo.Migration.Documents.Serializers;
-using Mongo.Migration.Migrations.Database;
-using Mongo.Migration.Migrations.Document;
-using Mongo.Migration.Migrations.Locators;
 using Mongo.Migration.Services;
-using Mongo.Migration.Services.Interceptors;
-
 namespace Mongo.Migration.Startup.DotNetCore;
 
 public static class MongoMigrationExtensions
 {
-    public static void AddMigration(this IServiceCollection services, IMongoMigrationSettings? settings = null)
+    public static IServiceCollection AddMigration(
+        this IServiceCollection services,
+        Action<MongoMigrationBuilder>? configure = null)
     {
-        RegisterDefaults(services, settings ?? new MongoMigrationSettings());
+        MongoMigrationBuilder builder = new MongoMigrationBuilder(services);
 
-        services.AddScoped<IMigrationService, MigrationService>();
+        configure?.Invoke(builder);
+
+        builder.AddAllMigrationsIfNothingWasAdded();
+
+        return services;
     }
 
-    private static void RegisterDefaults(IServiceCollection services, IMongoMigrationSettings settings)
+    public static async Task InitializeAndMigrateAsync(this IApplicationBuilder app, string databaseName, string? targetDatabaseVersion)
     {
-        services.AddSingleton(settings);
+        IMigrationService migrationService = app.ApplicationServices.GetRequiredService<IMigrationService>();
+        migrationService.RegisterBsonStatics();
 
-        services.AddSingleton(typeof(IMigrationLocator<>), typeof(TypeMigrationDependencyLocator<>));
-        services.AddSingleton<IDatabaseTypeMigrationDependencyLocator, DatabaseTypeMigrationDependencyLocator>();
-        services.AddSingleton<ICollectionLocator, CollectionLocator>();
-        services.AddSingleton<IRuntimeVersionLocator, RuntimeVersionLocator>();
-        services.AddSingleton<IStartUpVersionLocator, StartUpVersionLocator>();
-
-        services.AddTransient<IDatabaseVersionService, DatabaseVersionService>();
-        services.AddTransient<IDocumentVersionService, DocumentVersionService>();
-        services.AddTransient<IMigrationInterceptorFactory, MigrationInterceptorFactory>();
-        services.AddTransient<DocumentVersionSerializer, DocumentVersionSerializer>();
-
-        services.AddTransient<IStartUpDocumentMigrationRunner, StartUpDocumentMigrationRunner>();
-        services.AddTransient<IDocumentMigrationRunner, DocumentMigrationRunner>();
-
-        services.AddTransient<IStartUpDatabaseMigrationRunner, StartUpDatabaseMigrationRunner>();
-        services.AddTransient<IDatabaseMigrationRunner, DatabaseMigrationRunner>();
-
-        services.AddTransient<IMigrationInterceptorProvider, MigrationInterceptorProvider>();
-
-        services.AddTransient<IMongoMigration, MongoMigration>();
+        await migrationService.MigrateAsync(databaseName, targetDatabaseVersion);
     }
 }

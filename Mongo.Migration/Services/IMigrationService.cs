@@ -1,6 +1,8 @@
 ﻿namespace Mongo.Migration.Services;
 
-internal interface IMigrationService
+public interface IMigrationService
 {
-    void Migrate();
+    void RegisterBsonStatics();
+
+    Task MigrateAsync(string databaseName, string? targetDatabaseVersion);
 }

@@ -12,15 +12,15 @@ internal class TestDocumentWithTwoMigrationMiddleVersion001 : DocumentMigration<
 
     public override void Up(BsonDocument document)
     {
-        var doors = document["Dors"].ToInt32();
-        document.Add("Doors", doors);
-        document.Remove("Dors");
+        var doors = document["Doors0"].ToInt32();
+        document.Add("Doors1", doors);
+        document.Remove("Doors0");
     }
 
     public override void Down(BsonDocument document)
     {
-        var doors = document["Doors"].ToInt32();
-        document.Add("Dors", doors);
-        document.Remove("Doors");
+        var doors = document["Doors1"].ToInt32();
+        document.Add("Doors0", doors);
+        document.Remove("Doors1");
     }
 }

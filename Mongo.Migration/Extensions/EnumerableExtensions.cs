@@ -18,7 +18,7 @@ internal static class EnumerableExtensions
             }
 
             var typeName = element.GetType().Name;
-            throw new DuplicateVersionException(typeName, element.Version);
+            throw new DuplicateVersionException(typeName, element.Version.ToString());
         }
 
         return list;

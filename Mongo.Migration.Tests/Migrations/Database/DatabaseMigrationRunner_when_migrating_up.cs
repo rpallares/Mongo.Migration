@@ -14,11 +14,11 @@ internal class DatabaseMigrationRunnerWhenMigratingUp : DatabaseIntegrationTest
     public async Task When_database_has_no_migrations_Then_all_migrations_are_used()
     {
         // Arrange
-        await OnSetUpAsync(DocumentVersion.Empty());
-        IDatabaseMigrationRunner runner = Provider.GetRequiredService<IDatabaseMigrationRunner>();
+        await OnSetUpAsync();
+        IDatabaseMigrationRunner runner = TestcontainersContext.Provider.GetRequiredService<IDatabaseMigrationRunner>();
 
         // Act
-        runner.Run(Db);
+        runner.Run(Db, DocumentVersion.Empty);
 
         // Assert
         var migrations = GetMigrationHistory();
@@ -32,12 +32,12 @@ internal class DatabaseMigrationRunnerWhenMigratingUp : DatabaseIntegrationTest
     public async Task When_database_has_migrations_Then_latest_migrations_are_used()
     {
         // Arrange
-        await OnSetUpAsync(DocumentVersion.Empty());
-        IDatabaseMigrationRunner runner = Provider.GetRequiredService<IDatabaseMigrationRunner>();
+        await OnSetUpAsync();
+        IDatabaseMigrationRunner runner = TestcontainersContext.Provider.GetRequiredService<IDatabaseMigrationRunner>();
         InsertMigrations(new DatabaseMigration[] { new TestDatabaseMigration001(), new TestDatabaseMigration002() });
 
         // Act
-        runner.Run(Db);
+        runner.Run(Db, DocumentVersion.Empty);
 
         // Assert
         var migrations = GetMigrationHistory();
@@ -49,12 +49,12 @@ internal class DatabaseMigrationRunnerWhenMigratingUp : DatabaseIntegrationTest
     public async Task When_database_has_latest_version_Then_nothing_happens()
     {
         // Arrange
-        await OnSetUpAsync(DocumentVersion.Empty());
-        IDatabaseMigrationRunner runner = Provider.GetRequiredService<IDatabaseMigrationRunner>();
+        await OnSetUpAsync();
+        IDatabaseMigrationRunner runner = TestcontainersContext.Provider.GetRequiredService<IDatabaseMigrationRunner>();
         InsertMigrations(new DatabaseMigration[] { new TestDatabaseMigration001(), new TestDatabaseMigration002(), new TestDatabaseMigration003() });
 
         // Act
-        runner.Run(Db);
+        runner.Run(Db, DocumentVersion.Empty);
 
         // Assert
         var migrations = GetMigrationHistory();

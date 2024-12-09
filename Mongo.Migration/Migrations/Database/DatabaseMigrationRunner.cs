@@ -26,18 +26,19 @@ internal class DatabaseMigrationRunner : IDatabaseMigrationRunner
         _logger = logger;
     }
 
-    public void Run(IMongoDatabase db)
+    public void Run(IMongoDatabase db, DocumentVersion? targetVersion = null)
     {
         _logger.LogInformation("Database migration started.");
-        var databaseVersion = _databaseVersionService.GetLatestDatabaseVersion(db);
-        var currentOrLatest = _databaseVersionService.GetCurrentOrLatestMigrationVersion();
+        DocumentVersion databaseVersion = _databaseVersionService.GetLatestDatabaseVersion(db);
+        DocumentVersion currentOrLatest = targetVersion is not null && targetVersion > DocumentVersion.Empty
+            ? targetVersion.Value
+            : _databaseVersionService.GetLatestMigrationVersion();
 
-        if (databaseVersion == currentOrLatest)
+        if (databaseVersion != currentOrLatest)
         {
-            return;
+            MigrateUpOrDown(db, databaseVersion, currentOrLatest);
         }
-
-        MigrateUpOrDown(db, databaseVersion, currentOrLatest);
+        
         _logger.LogInformation("Database migration finished.");
     }
 
@@ -70,8 +71,10 @@ internal class DatabaseMigrationRunner : IDatabaseMigrationRunner
         }
     }
 
+    // consider filtering migration version between current and to
     private void MigrateDown(IMongoDatabase db, DocumentVersion currentVersion, DocumentVersion toVersion)
     {
+        //var migrations = _migrationLocator.GetMigrationsFromTo(_databaseMigrationType, currentVersion, toVersion).Reverse().ToList(); ??? => look not ordered
         var migrations = _migrationLocator
             .GetMigrationsGtEq(_databaseMigrationType, toVersion)
             .OrderByDescending(m => m.Version)

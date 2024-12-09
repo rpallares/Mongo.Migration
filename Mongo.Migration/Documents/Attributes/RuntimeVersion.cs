@@ -7,6 +7,6 @@ public class RuntimeVersion : Attribute
 
     public RuntimeVersion(string version)
     {
-        Version = version;
+        Version = DocumentVersion.Parse(version.AsSpan());
     }
 }

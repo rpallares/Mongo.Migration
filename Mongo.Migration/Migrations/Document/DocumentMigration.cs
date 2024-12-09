@@ -9,7 +9,7 @@ public abstract class DocumentMigration<TClass> : IDocumentMigration
 {
     protected DocumentMigration(string version)
     {
-        Version = version;
+        Version = DocumentVersion.Parse(version.AsSpan());
     }
 
     public DocumentVersion Version { get; }

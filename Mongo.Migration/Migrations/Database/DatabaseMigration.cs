@@ -8,7 +8,7 @@ public abstract class DatabaseMigration : IDatabaseMigration
 {
     protected DatabaseMigration(string version)
     {
-        Version = version;
+        Version = DocumentVersion.Parse(version.AsSpan());
     }
 
     public DocumentVersion Version { get; }

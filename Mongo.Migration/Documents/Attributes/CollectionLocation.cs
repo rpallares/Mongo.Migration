@@ -5,8 +5,8 @@ public class CollectionLocation : Attribute
 {
     public CollectionLocationInformation CollectionInformation { get; }
 
-    public CollectionLocation(string collectionName, string? databaseName = null)
+    public CollectionLocation(string collectionName)
     {
-        CollectionInformation = new(databaseName, collectionName);
+        CollectionInformation = new(collectionName);
     }
 }

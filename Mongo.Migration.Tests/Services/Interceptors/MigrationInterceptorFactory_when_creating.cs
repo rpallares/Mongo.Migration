@@ -13,7 +13,7 @@ internal class MigrationInterceptorFactoryWhenCreating : IntegrationTest
     public void If_type_is_assignable_to_document_Then_interceptor_is_created()
     {
         // Arrange
-        var factory = Provider.GetRequiredService<IMigrationInterceptorFactory>();
+        var factory = TestcontainersContext.Provider.GetRequiredService<IMigrationInterceptorFactory>();
 
         // Act
         var interceptor = factory.Create(typeof(TestDocumentWithOneMigration));
@@ -26,7 +26,7 @@ internal class MigrationInterceptorFactoryWhenCreating : IntegrationTest
     public void If_type_is_not_assignable_to_document_Then_exception_is_thrown()
     {
         // Arrange
-        var factory = Provider.GetRequiredService<IMigrationInterceptorFactory>();
+        var factory = TestcontainersContext.Provider.GetRequiredService<IMigrationInterceptorFactory>();
 
         // Act
         Action act = () => factory.Create(typeof(TestClass));
@@ -39,7 +39,7 @@ internal class MigrationInterceptorFactoryWhenCreating : IntegrationTest
     public void If_type_is_null_Then_exception_is_thrown()
     {
         // Arrange
-        var factory = Provider.GetRequiredService<IMigrationInterceptorFactory>();
+        var factory = TestcontainersContext.Provider.GetRequiredService<IMigrationInterceptorFactory>();
 
         // Act
         Action act = () => factory.Create(null!);

@@ -14,7 +14,7 @@ internal class DocumentMigrationRunnerWhenMigratingDown : IntegrationTest
     public void When_migrating_down_Then_all_migrations_are_used()
     {
         // Arrange
-        IDocumentMigrationRunner runner = Provider.GetRequiredService<IDocumentMigrationRunner>();
+        IDocumentMigrationRunner runner = TestcontainersContext.Provider.GetRequiredService<IDocumentMigrationRunner>();
         BsonDocument document = new()
         {
             { "Version", "0.0.2" },
@@ -33,18 +33,18 @@ internal class DocumentMigrationRunnerWhenMigratingDown : IntegrationTest
     public void When_document_has_Then_all_migrations_are_used_to_that_version()
     {
         // Arrange
-        IDocumentMigrationRunner runner = Provider.GetRequiredService<IDocumentMigrationRunner>();
+        IDocumentMigrationRunner runner = TestcontainersContext.Provider.GetRequiredService<IDocumentMigrationRunner>();
         BsonDocument document = new()
         {
             { "Version", "0.0.2" },
-            { "Door", 3 }
+            { "Doors2", 3 }
         };
 
         // Act
         runner.Run(typeof(TestDocumentWithTwoMigrationMiddleVersion), document);
 
         // Assert
-        document.Names.ToList()[1].Should().Be("Doors");
+        document.Names.ToList()[1].Should().Be("Doors1");
         document.Values.ToList()[0].AsString.Should().Be("0.0.1");
     }
 }

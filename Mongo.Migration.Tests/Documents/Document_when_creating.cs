@@ -27,6 +27,6 @@ public class DocumentWhenCreating
         var version = document.Version;
 
         // Assert
-        version.Should().Be("0.0.0");
+        version.ToString().Should().Be("0.0.0");
     }
 }

@@ -13,29 +13,22 @@ internal class DatabaseVersionService : IDatabaseVersionService
 
     private readonly IDatabaseTypeMigrationDependencyLocator _migrationLocator;
 
-    private readonly IMongoMigrationSettings _mongoMigrationSettings;
-
-    public DatabaseVersionService(
-        IDatabaseTypeMigrationDependencyLocator migrationLocator,
-        IMongoMigrationSettings mongoMigrationSettings)
+    public DatabaseVersionService(IDatabaseTypeMigrationDependencyLocator migrationLocator)
     {
         _migrationLocator = migrationLocator;
-        _mongoMigrationSettings = mongoMigrationSettings;
     }
 
-    public DocumentVersion GetCurrentOrLatestMigrationVersion()
+    public DocumentVersion GetLatestMigrationVersion()
     {
-        return _mongoMigrationSettings.DatabaseMigrationVersion > DocumentVersion.Empty()
-            ? _mongoMigrationSettings.DatabaseMigrationVersion
-            : _migrationLocator.GetLatestVersion(typeof(DatabaseMigration));
+        return _migrationLocator.GetLatestVersion(typeof(DatabaseMigration));
     }
 
     public DocumentVersion GetLatestDatabaseVersion(IMongoDatabase db)
     {
         var migrations = GetMigrationsCollection(db).Find(m => true).ToList();
-        if (migrations == null || migrations.Count <= 0)
+        if (migrations is { Count: 0 })
         {
-            return DocumentVersion.Default();
+            return DocumentVersion.Default;
         }
 
         return migrations.Max(m => m.Version);

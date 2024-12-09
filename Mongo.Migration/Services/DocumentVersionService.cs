@@ -9,9 +9,9 @@ using MongoDB.Bson;
 
 namespace Mongo.Migration.Services;
 
-internal class DocumentVersionService : IDocumentVersionService
+internal sealed class DocumentVersionService : IDocumentVersionService
 {
-    private static readonly string VersionFieldName = "Version";
+    private const string DefaultVersionFieldName = "Version";
 
     private readonly IMigrationLocator<IDocumentMigration> _migrationLocator;
 
@@ -25,13 +25,13 @@ internal class DocumentVersionService : IDocumentVersionService
         IMigrationLocator<IDocumentMigration> migrationLocator,
         IRuntimeVersionLocator runtimeVersionLocator,
         IStartUpVersionLocator startUpVersionLocator,
-        IMongoMigrationSettings mongoMigrationSettings)
+        MongoMigrationSettings mongoMigrationSettings)
     {
         _migrationLocator = migrationLocator;
         _runtimeVersionLocator = runtimeVersionLocator;
         _startUpVersionLocator = startUpVersionLocator;
         _versionFieldName = string.IsNullOrWhiteSpace(mongoMigrationSettings.VersionFieldName)
-            ? VersionFieldName
+            ? DefaultVersionFieldName
             : mongoMigrationSettings.VersionFieldName;
     }
 
@@ -54,26 +54,24 @@ internal class DocumentVersionService : IDocumentVersionService
 
     public DocumentVersion GetVersionOrDefault(BsonDocument document)
     {
-        document.TryGetValue(GetVersionFieldName(), out BsonValue value);
-
-        if (value != null && !value.IsBsonNull)
+        if (document.TryGetValue(GetVersionFieldName(), out BsonValue value) && !value.IsBsonNull)
         {
-            return value.AsString;
+            return DocumentVersion.Parse(value.AsString.AsSpan());
         }
 
-        return DocumentVersion.Default();
+        return DocumentVersion.Default;
     }
 
     public void SetVersion(BsonDocument document, DocumentVersion version)
     {
-        document[GetVersionFieldName()] = version.ToString();
+        document[GetVersionFieldName()] = new BsonString(version.ToString());
     }
 
     public void DetermineVersion<TClass>(TClass instance)
         where TClass : class, IDocument
     {
         var type = typeof(TClass);
-        var documentVersion = instance.Version.ToString();
+        var documentVersion = instance.Version;
         var latestVersion = _migrationLocator.GetLatestVersion(type);
         var currentVersion = _runtimeVersionLocator.GetLocateOrNull(type) ?? latestVersion;
 
@@ -87,13 +85,13 @@ internal class DocumentVersionService : IDocumentVersionService
             return;
         }
 
-        if (DocumentVersion.Default() == documentVersion)
+        if (DocumentVersion.Default == documentVersion || DocumentVersion.Empty == documentVersion)
         {
             SetVersion(instance, currentVersion, latestVersion);
             return;
         }
 
-        throw new VersionViolationException(currentVersion.ToString(), documentVersion, latestVersion);
+        throw new VersionViolationException(currentVersion, documentVersion, latestVersion);
     }
 
     public DocumentVersion DetermineLastVersion(
@@ -116,13 +114,13 @@ internal class DocumentVersionService : IDocumentVersionService
 
     private static void SetVersion<TClass>(
         TClass instance,
-        DocumentVersion? currentVersion,
+        DocumentVersion currentVersion,
         DocumentVersion latestVersion)
         where TClass : class, IDocument
     {
         if (currentVersion < latestVersion)
         {
-            instance.Version = currentVersion.ToString();
+            instance.Version = currentVersion;
             return;
         }
 

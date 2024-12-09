@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
+using Mongo.Migration.Documents;
 using Mongo.Migration.Migrations.Locators;
 using Mongo.Migration.Tests.TestDoubles;
 using NUnit.Framework;
@@ -45,14 +46,17 @@ public class TypeMigrationLocatorWhenLocate
         var version = _locator.GetLatestVersion(typeof(TestDocumentWithTwoMigration));
 
         // Assert
-        version.Should().Be("0.0.2");
+        version.ToString().Should().Be("0.0.2");
     }
 
     [Test]
     public void When_get_migrations_gt_and_equal_version()
     {
         // Act
-        var result = _locator.GetMigrationsGtEq(typeof(TestDocumentWithTwoMigration), "0.0.1").ToList();
+        var result = _locator.GetMigrationsGtEq(
+            typeof(TestDocumentWithTwoMigration), 
+            new DocumentVersion(0,0,1))
+            .ToList();
 
         // Assert
         result[0].Should().BeOfType<TestDocumentWithTwoMigration001>();
@@ -63,7 +67,10 @@ public class TypeMigrationLocatorWhenLocate
     public void When_get_migrations_gt_version()
     {
         // Act
-        var result = _locator.GetMigrationsGt(typeof(TestDocumentWithTwoMigration), "0.0.1").ToList();
+        var result = _locator.GetMigrationsGt(
+            typeof(TestDocumentWithTwoMigration),
+            new DocumentVersion(0, 0, 1))
+            .ToList();
 
         // Assert
         result[0].Should().BeOfType<TestDocumentWithTwoMigration002>();

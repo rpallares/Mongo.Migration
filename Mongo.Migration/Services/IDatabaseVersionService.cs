@@ -7,7 +7,7 @@ namespace Mongo.Migration.Services;
 
 public interface IDatabaseVersionService
 {
-    DocumentVersion GetCurrentOrLatestMigrationVersion();
+    DocumentVersion GetLatestMigrationVersion();
 
     DocumentVersion GetLatestDatabaseVersion(IMongoDatabase db);
 

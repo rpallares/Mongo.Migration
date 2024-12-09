@@ -28,7 +28,7 @@ public class DocumentVersionSerializerWhenSerializeAndDeserialize
 
         // Assert 
         result.Should().BeOfType<DocumentVersion>();
-        result.Should().Be("0.1.1");
+        result.ToString().Should().Be("0.1.1");
     }
 
     [Test]
@@ -38,7 +38,7 @@ public class DocumentVersionSerializerWhenSerializeAndDeserialize
         BsonDocumentWriter writer = CreateVersionWriter();
         BsonSerializationContext context = BsonSerializationContext.CreateRoot(writer);
         var args = new BsonSerializationArgs { NominalType = typeof(DocumentVersion) };
-        var version = new DocumentVersion("0.0.1");
+        var version = new DocumentVersion(0,0,1);
 
         // Act 
         _serializer.Serialize(context, args, version);
