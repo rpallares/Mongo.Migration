@@ -1,11 +1,10 @@
 ﻿using Mongo.Migration.Documents;
-
 using MongoDB.Bson;
 
 namespace Mongo.Migration.Migrations.Document;
 
 public abstract class DocumentMigration<TClass> : IDocumentMigration
-    where TClass : class, IDocument
+    where TClass : IDocument
 {
     protected DocumentMigration(string version)
     {

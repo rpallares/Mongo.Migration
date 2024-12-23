@@ -62,13 +62,13 @@ internal sealed class DocumentVersionService : IDocumentVersionService
         return DocumentVersion.Default;
     }
 
-    public void SetVersion(BsonDocument document, DocumentVersion version)
+    public void SetVersion(BsonDocument document, in DocumentVersion version)
     {
         document[GetVersionFieldName()] = new BsonString(version.ToString());
     }
 
     public void DetermineVersion<TClass>(TClass instance)
-        where TClass : class, IDocument
+        where TClass : IDocument
     {
         var type = typeof(TClass);
         var documentVersion = instance.Version;
@@ -95,7 +95,7 @@ internal sealed class DocumentVersionService : IDocumentVersionService
     }
 
     public DocumentVersion DetermineLastVersion(
-        DocumentVersion version,
+        in DocumentVersion version,
         List<IDocumentMigration> migrations,
         int currentMigration)
     {
@@ -114,9 +114,9 @@ internal sealed class DocumentVersionService : IDocumentVersionService
 
     private static void SetVersion<TClass>(
         TClass instance,
-        DocumentVersion currentVersion,
-        DocumentVersion latestVersion)
-        where TClass : class, IDocument
+        in DocumentVersion currentVersion,
+        in DocumentVersion latestVersion)
+        where TClass : IDocument
     {
         if (currentVersion < latestVersion)
         {

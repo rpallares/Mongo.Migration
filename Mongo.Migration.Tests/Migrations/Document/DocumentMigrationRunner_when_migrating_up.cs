@@ -43,8 +43,8 @@ internal class DocumentMigrationRunnerWhenMigratingUp : IntegrationTest
         runner.Run(typeof(TestDocumentWithTwoMigrationHighestVersion), document);
 
         // Assert
-        document.Names.ToList()[1].Should().Be("Door");
-        document.Values.ToList()[0].AsString.Should().Be("0.0.2");
+        document["Door"].AsInt32.Should().Be(3);
+        document["Version"].AsString.Should().Be("0.0.2");
     }
 
     [Test]

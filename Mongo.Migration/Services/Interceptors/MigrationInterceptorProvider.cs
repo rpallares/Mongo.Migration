@@ -8,7 +8,6 @@ internal class MigrationInterceptorProvider : IMigrationInterceptorProvider
 {
     private static readonly Type s_iDocumentType = typeof(IDocument);
     private static readonly Type s_bsonDocumentType = typeof(BsonDocument);
-
     private readonly IMigrationInterceptorFactory _migrationInterceptorFactory;
 
     public MigrationInterceptorProvider(IMigrationInterceptorFactory migrationInterceptorFactory)
@@ -35,8 +34,8 @@ internal class MigrationInterceptorProvider : IMigrationInterceptorProvider
 
     private static bool ShouldBeMigrated(Type type)
     {
-        return type != s_bsonDocumentType
-            && type.GetInterfaces().Contains(s_iDocumentType);
+        return type != s_bsonDocumentType 
+               && type.GetInterfaces().Contains(s_iDocumentType);
     }
 
     public IMigrationInterceptorFactory MigrationInterceptorFactory => _migrationInterceptorFactory;

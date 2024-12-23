@@ -50,29 +50,26 @@ public class TypeMigrationLocatorWhenLocate
     }
 
     [Test]
-    public void When_get_migrations_gt_and_equal_version()
+    public void When_get_migrations_from_to()
     {
         // Act
-        var result = _locator.GetMigrationsGtEq(
-            typeof(TestDocumentWithTwoMigration), 
-            new DocumentVersion(0,0,1))
+        var result = _locator
+            .GetMigrationsFromTo(typeof(TestDocumentWithTwoMigration), DocumentVersion.Default, DocumentVersion.Parse("0.0.1"))
             .ToList();
-
         // Assert
+        result.Should().HaveCount(1);
         result[0].Should().BeOfType<TestDocumentWithTwoMigration001>();
-        result[1].Should().BeOfType<TestDocumentWithTwoMigration002>();
     }
 
     [Test]
-    public void When_get_migrations_gt_version()
+    public void When_get_migrations_from_to_down()
     {
         // Act
-        var result = _locator.GetMigrationsGt(
-            typeof(TestDocumentWithTwoMigration),
-            new DocumentVersion(0, 0, 1))
+        var result = _locator
+            .GetMigrationsFromToDown(typeof(TestDocumentWithTwoMigration), DocumentVersion.Parse("0.0.2"), DocumentVersion.Parse("0.0.1"))
             .ToList();
-
         // Assert
+        result.Should().HaveCount(1);
         result[0].Should().BeOfType<TestDocumentWithTwoMigration002>();
     }
 }

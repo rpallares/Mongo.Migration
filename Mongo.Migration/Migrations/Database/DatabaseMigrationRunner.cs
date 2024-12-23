@@ -26,7 +26,7 @@ internal class DatabaseMigrationRunner : IDatabaseMigrationRunner
         _logger = logger;
     }
 
-    public void Run(IMongoDatabase db, DocumentVersion? targetVersion = null)
+    public void Run(IMongoDatabase db, in DocumentVersion? targetVersion = null)
     {
         _logger.LogInformation("Database migration started.");
         DocumentVersion databaseVersion = _databaseVersionService.GetLatestDatabaseVersion(db);
@@ -44,8 +44,8 @@ internal class DatabaseMigrationRunner : IDatabaseMigrationRunner
 
     private void MigrateUpOrDown(
         IMongoDatabase db,
-        DocumentVersion databaseVersion,
-        DocumentVersion to)
+        in DocumentVersion databaseVersion,
+        in DocumentVersion to)
     {
         if (databaseVersion > to)
         {
@@ -56,9 +56,10 @@ internal class DatabaseMigrationRunner : IDatabaseMigrationRunner
         MigrateUp(db, databaseVersion, to);
     }
 
-    private void MigrateUp(IMongoDatabase db, DocumentVersion currentVersion, DocumentVersion toVersion)
+    private void MigrateUp(IMongoDatabase db, in DocumentVersion currentVersion, in DocumentVersion toVersion)
     {
-        var migrations = _migrationLocator.GetMigrationsFromTo(_databaseMigrationType, currentVersion, toVersion).ToList();
+        var migrations = _migrationLocator
+            .GetMigrationsFromTo(_databaseMigrationType, currentVersion, toVersion);
 
         foreach (var migration in migrations)
         {
@@ -71,22 +72,13 @@ internal class DatabaseMigrationRunner : IDatabaseMigrationRunner
         }
     }
 
-    // consider filtering migration version between current and to
-    private void MigrateDown(IMongoDatabase db, DocumentVersion currentVersion, DocumentVersion toVersion)
+    private void MigrateDown(IMongoDatabase db, in DocumentVersion currentVersion, in DocumentVersion toVersion)
     {
-        //var migrations = _migrationLocator.GetMigrationsFromTo(_databaseMigrationType, currentVersion, toVersion).Reverse().ToList(); ??? => look not ordered
         var migrations = _migrationLocator
-            .GetMigrationsGtEq(_databaseMigrationType, toVersion)
-            .OrderByDescending(m => m.Version)
-            .ToList();
+            .GetMigrationsFromToDown(_databaseMigrationType, currentVersion, toVersion);
 
         foreach (var migration in migrations)
         {
-            if (migration.Version == toVersion)
-            {
-                break;
-            }
-
             _logger.LogInformation("Database Migration Down: {Type}:{Version} ", migration.GetType(), migration.Version);
 
             migration.Down(db);

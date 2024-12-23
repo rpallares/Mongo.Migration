@@ -20,18 +20,11 @@ internal class DocumentMigrationRunner : IDocumentMigrationRunner
 
     public void Run(Type type, BsonDocument document)
     {
-        var documentVersion = _documentVersionService.GetVersionOrDefault(document);
         var currentOrLatest = _documentVersionService.GetCurrentOrLatestMigrationVersion(type);
-
-        if (documentVersion == currentOrLatest)
-        {
-            return;
-        }
-
-        MigrateUpOrDown(type, document, documentVersion, currentOrLatest);
+        Run(type, document, currentOrLatest);
     }
 
-    public void Run(Type type, BsonDocument document, DocumentVersion to)
+    public void Run(Type type, BsonDocument document, in DocumentVersion to)
     {
         var documentVersion = _documentVersionService.GetVersionOrDefault(document);
 
@@ -46,47 +39,40 @@ internal class DocumentMigrationRunner : IDocumentMigrationRunner
     private void MigrateUpOrDown(
         Type type,
         BsonDocument document,
-        DocumentVersion documentVersion,
-        DocumentVersion to)
+        in DocumentVersion documentVersion,
+        in DocumentVersion to)
     {
         if (documentVersion > to)
         {
-            MigrateDown(type, document, to);
-            return;
+            MigrateDown(type, document, documentVersion, to);
         }
-
-        MigrateUp(type, document, documentVersion, to);
+        else
+        {
+            MigrateUp(type, document, documentVersion, to);
+        }
+        
+        _documentVersionService.SetVersion(document, to);
     }
 
-    private void MigrateUp(Type type, BsonDocument document, DocumentVersion version, DocumentVersion toVersion)
+    private void MigrateUp(Type type, BsonDocument document, in DocumentVersion version, in DocumentVersion toVersion)
     {
-        var migrations = _migrationLocator.GetMigrationsFromTo(type, version, toVersion).ToList();
+        var migrations = _migrationLocator
+            .GetMigrationsFromTo(type, version, toVersion);
 
         foreach (var migration in migrations)
         {
             migration.Up(document);
-            _documentVersionService.SetVersion(document, migration.Version);
         }
     }
 
-    private void MigrateDown(Type type, BsonDocument document, DocumentVersion version)
+    private void MigrateDown(Type type, BsonDocument document, in DocumentVersion version, in DocumentVersion toVersion)
     {
         var migrations = _migrationLocator
-            .GetMigrationsGtEq(type, version)
-            .OrderByDescending(m => m.Version)
-            .ToList();
+                .GetMigrationsFromToDown(type, version, toVersion);
 
-        for (var m = 0; m < migrations.Count; m++)
+        foreach (var migration in migrations)
         {
-            if (version == migrations[m].Version)
-            {
-                break;
-            }
-
-            migrations[m].Down(document);
-
-            var docVersion = _documentVersionService.DetermineLastVersion(version, migrations, m);
-            _documentVersionService.SetVersion(document, docVersion);
+            migration.Down(document);
         }
     }
 }

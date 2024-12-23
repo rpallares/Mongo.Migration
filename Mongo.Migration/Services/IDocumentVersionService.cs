@@ -14,13 +14,13 @@ public interface IDocumentVersionService
 
     DocumentVersion GetVersionOrDefault(BsonDocument document);
 
-    void SetVersion(BsonDocument document, DocumentVersion version);
+    void SetVersion(BsonDocument document, in DocumentVersion version);
 
     void DetermineVersion<TClass>(TClass instance)
-        where TClass : class, IDocument;
+        where TClass : IDocument;
 
     DocumentVersion DetermineLastVersion(
-        DocumentVersion version,
+        in DocumentVersion version,
         List<IDocumentMigration> migrations,
         int currentMigration);
 }

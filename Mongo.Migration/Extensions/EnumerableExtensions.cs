@@ -7,7 +7,7 @@ namespace Mongo.Migration.Extensions;
 internal static class EnumerableExtensions
 {
     internal static IEnumerable<TMigrationType> CheckForDuplicates<TMigrationType>(this IEnumerable<TMigrationType> list)
-        where TMigrationType : class, IMigration
+        where TMigrationType : IMigration
     {
         var uniqueHashes = new HashSet<DocumentVersion>();
         foreach (var element in list)
@@ -25,7 +25,7 @@ internal static class EnumerableExtensions
 
     internal static IDictionary<Type, IReadOnlyCollection<TMigrationType>> ToMigrationDictionary<TMigrationType>(
         this IEnumerable<TMigrationType> migrations)
-        where TMigrationType : class, IMigration
+        where TMigrationType : IMigration
     {
         var dictionary = new Dictionary<Type, IReadOnlyCollection<TMigrationType>>();
         var list = migrations.ToList();

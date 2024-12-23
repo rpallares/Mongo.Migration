@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Immutable;
+using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Mongo.Migration.Documents;
 
@@ -35,7 +36,7 @@ public abstract class MigrationLocator<TMigrationType> : IMigrationLocator<TMigr
                 _logger.LogWarning("No migration found");
             }
 
-            return _migrations!;
+            return _migrations ?? ImmutableDictionary<Type, IReadOnlyCollection<TMigrationType>>.Empty;
         }
         set => _migrations = value;
     }
@@ -52,33 +53,15 @@ public abstract class MigrationLocator<TMigrationType> : IMigrationLocator<TMigr
 
     public IEnumerable<TMigrationType> GetMigrationsFromTo(Type type, DocumentVersion version, DocumentVersion otherVersion)
     {
-        var migrations = GetMigrations(type);
-
-        return
-            migrations
-                .Where(m => m.Version > version)
-                .Where(m => m.Version <= otherVersion)
-                .ToList();
+        return GetMigrations(type)
+            .Where(m => m.Version > version && m.Version <= otherVersion);
     }
 
-    public IEnumerable<TMigrationType> GetMigrationsGt(Type type, DocumentVersion version)
+    public IEnumerable<TMigrationType> GetMigrationsFromToDown(Type type, DocumentVersion version, DocumentVersion otherVersion)
     {
-        var migrations = GetMigrations(type);
-
-        return
-            migrations
-                .Where(m => m.Version > version)
-                .ToList();
-    }
-
-    public IEnumerable<TMigrationType> GetMigrationsGtEq(Type type, DocumentVersion version)
-    {
-        var migrations = GetMigrations(type);
-
-        return
-            migrations
-                .Where(m => m.Version >= version)
-                .ToList();
+        return GetMigrations(type)
+            .Where(m => m.Version <= version && m.Version > otherVersion)
+            .Reverse();
     }
 
     public DocumentVersion GetLatestVersion(Type type)

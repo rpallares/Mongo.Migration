@@ -8,7 +8,7 @@ using MongoDB.Bson.Serialization.Serializers;
 namespace Mongo.Migration.Services.Interceptors;
 
 internal sealed class MigrationInterceptor<TDocument> : SerializerBase<TDocument>
-    where TDocument : class, IDocument
+    where TDocument : IDocument
 {
     private static readonly Type s_tDocumentType = typeof(TDocument);
 
