@@ -12,14 +12,14 @@ internal static class EnumerableExtensions
         var uniqueHashes = new HashSet<DocumentVersion>();
         foreach (var element in list)
         {
-            var version = element.Version;
-            if (uniqueHashes.Add(version))
+            if (uniqueHashes.Add(element.Version))
             {
                 yield return element;
             }
-
-            var typeName = element.GetType().Name;
-            throw new DuplicateVersionException(typeName, element.Version.ToString());
+            else
+            {
+                throw new DuplicateVersionException(element.GetType().Name, element.Version.ToString());
+            }
         }
     }
 
