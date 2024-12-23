@@ -34,9 +34,8 @@ internal class DocumentMigrationRunner : IDocumentMigrationRunner
     public void Run(Type type, BsonDocument document, DocumentVersion to)
     {
         var documentVersion = _documentVersionService.GetVersionOrDefault(document);
-        var currentOrLatest = _documentVersionService.GetCurrentOrLatestMigrationVersion(type);
 
-        if (documentVersion == to || documentVersion == currentOrLatest)
+        if (documentVersion == to)
         {
             return;
         }
