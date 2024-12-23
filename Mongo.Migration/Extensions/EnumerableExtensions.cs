@@ -1,4 +1,5 @@
-﻿using Mongo.Migration.Exceptions;
+﻿using Mongo.Migration.Documents;
+using Mongo.Migration.Exceptions;
 using Mongo.Migration.Migrations;
 
 namespace Mongo.Migration.Extensions;
@@ -8,20 +9,18 @@ internal static class EnumerableExtensions
     internal static IEnumerable<TMigrationType> CheckForDuplicates<TMigrationType>(this IEnumerable<TMigrationType> list)
         where TMigrationType : class, IMigration
     {
-        var uniqueHashes = new HashSet<string>();
+        var uniqueHashes = new HashSet<DocumentVersion>();
         foreach (var element in list)
         {
-            var version = element.Version.ToString();
+            var version = element.Version;
             if (uniqueHashes.Add(version))
             {
-                continue;
+                yield return element;
             }
 
             var typeName = element.GetType().Name;
             throw new DuplicateVersionException(typeName, element.Version.ToString());
         }
-
-        return list;
     }
 
     internal static IDictionary<Type, IReadOnlyCollection<TMigrationType>> ToMigrationDictionary<TMigrationType>(
