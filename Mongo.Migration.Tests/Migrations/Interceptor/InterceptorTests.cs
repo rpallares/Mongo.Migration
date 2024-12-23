@@ -63,7 +63,7 @@ public class InterceptorMigrationWhenCreating : IntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.That(documents.Count, Is.EqualTo(3));
+            Assert.That(documents, Has.Count.EqualTo(3));
             Assert.That(
                 documents.Select(d => d.Version.ToString()),
                 Is.All.EqualTo("0.0.1"));

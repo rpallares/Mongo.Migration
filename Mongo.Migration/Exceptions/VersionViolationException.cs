@@ -8,7 +8,7 @@ public class VersionViolationException : Exception
         DocumentVersion currentVersion,
         DocumentVersion documentVersion,
         DocumentVersion latestVersion)
-        : base(string.Format(ErrorTexts.DuplicateVersion, currentVersion, documentVersion, latestVersion))
+        : base($"CurrentVersion: '{currentVersion}', DocumentVersion: '{documentVersion}', LatestMigrationVersion: '{latestVersion}'")
     {
     }
 }

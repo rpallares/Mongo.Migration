@@ -3,7 +3,7 @@
 internal class DuplicateVersionException : Exception
 {
     public DuplicateVersionException(string typeName, string version)
-        : base(string.Format(ErrorTexts.DuplicateVersion, typeName, version))
+        : base($"Migration '{typeName}' contains duplicate version: {version}")
     {
     }
 }

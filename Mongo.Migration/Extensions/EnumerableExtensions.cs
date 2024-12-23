@@ -28,22 +28,25 @@ internal static class EnumerableExtensions
         this IEnumerable<TMigrationType> migrations)
         where TMigrationType : class, IMigration
     {
-        var dictonary = new Dictionary<Type, IReadOnlyCollection<TMigrationType>>();
+        var dictionary = new Dictionary<Type, IReadOnlyCollection<TMigrationType>>();
         var list = migrations.ToList();
         var types = (from m in list select m.Type).Distinct();
 
         foreach (var type in types)
         {
-            if (dictonary.ContainsKey(type))
+            if (dictionary.ContainsKey(type))
             {
                 continue;
             }
 
-            var uniqueMigrations =
-                list.Where(m => m.Type == type).CheckForDuplicates().OrderBy(m => m.Version).ToList();
-            dictonary.Add(type, uniqueMigrations);
+            var uniqueMigrations = list
+                .Where(m => m.Type == type)
+                .CheckForDuplicates()
+                .OrderBy(m => m.Version)
+                .ToList();
+            dictionary.Add(type, uniqueMigrations);
         }
 
-        return dictonary;
+        return dictionary;
     }
 }

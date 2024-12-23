@@ -1,8 +1,6 @@
 using Mongo.Migration.Documents;
 using Mongo.Migration.Migrations.Database;
 using Mongo.Migration.Migrations.Locators;
-using Mongo.Migration.Startup;
-
 using MongoDB.Driver;
 
 namespace Mongo.Migration.Services;
