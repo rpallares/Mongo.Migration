@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using NUnit.Framework;
 
 namespace Mongo.Migration.Tests;
@@ -6,14 +7,14 @@ namespace Mongo.Migration.Tests;
 [TestFixture]
 public class IntegrationTest
 {
-    private const string DatabaseName = "PerformanceTest";
+    private const string DatabaseName = "IntegrationTest";
     private const string CollectionName = "Test";
 
     [SetUp]
-    protected async Task SetUpAsync()
+    protected void SetUp()
     {
         IMongoClient client = TestcontainersContext.MongoClient;
-        await client.GetDatabase(DatabaseName).CreateCollectionAsync(CollectionName);
+        client.GetDatabase(DatabaseName).GetCollection<BsonDocument>(CollectionName);
     }
 
     [TearDown]

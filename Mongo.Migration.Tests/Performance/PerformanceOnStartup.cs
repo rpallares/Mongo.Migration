@@ -21,27 +21,27 @@ public class PerformanceTestOnStartup
     private const int ToleranceMs = 2800;
 
     [Test]
-    public void When_migrating_number_of_documents()
+    public async Task When_migrating_number_of_documents()
     {
         // Arrange
         // Worm up MongoCache
         ClearCollection();
-        AddDocumentsToCache();
+        await AddDocumentsToCacheAsync();
         ClearCollection();
 
         // Act
         // Measure time of MongoDb processing without Mongo.Migration
-        InsertMany(DocumentCount, false);
+        await InsertDocumentsAsync(DocumentCount);
         var sw = new Stopwatch();
         sw.Start();
-        MigrateAll(false);
+        await QueryAllAsync(false);
         sw.Stop();
 
         ClearCollection();
 
         // Measure time of MongoDb processing with Mongo.Migration
         IMongoClient client = TestcontainersContext.MongoClient;
-        InsertMany(DocumentCount, true);
+        await InsertDocumentsAsync(DocumentCount);
         var swWithMigration = new Stopwatch();
         swWithMigration.Start();
         
@@ -54,37 +54,30 @@ public class PerformanceTestOnStartup
 
         var result = swWithMigration.ElapsedMilliseconds - sw.ElapsedMilliseconds;
 
-        TestContext.Out.WriteLine($"MongoDB: {sw.ElapsedMilliseconds}ms, Mongo.Migration: {swWithMigration.ElapsedMilliseconds}ms, Diff: {result}ms (Tolerance: {ToleranceMs}ms), Documents: {DocumentCount}, Migrations per Document: 2");
+        await TestContext.Out.WriteLineAsync($"MongoDB: {sw.ElapsedMilliseconds}ms, Mongo.Migration: {swWithMigration.ElapsedMilliseconds}ms, Diff: {result}ms (Tolerance: {ToleranceMs}ms), Documents: {DocumentCount}, Migrations per Document: 2");
         
         // Assert
         result.Should().BeLessThan(ToleranceMs);
     }
 
-    private static void InsertMany(int number, bool withVersion)
+    private static Task InsertDocumentsAsync(int documentCount)
     {
-        var documents = new List<BsonDocument>();
-        for (var n = 0; n < number; n++)
-        {
-            var document = new BsonDocument
+        var documents = Enumerable
+            .Range(0, documentCount)
+            .Select(i => new BsonDocument
             {
-                { "Dors", 3 }
-            };
-            if (withVersion)
-            {
-                document.Add("Version", "0.0.0");
-            }
+                { "_id", new BsonObjectId(ObjectId.GenerateNewId())},
+                { "Dors", new BsonInt32(i) },
+                { "Version", BsonString.Create("0.0.0") }
+            });
 
-            documents.Add(document);
-        }
-
-        TestcontainersContext.MongoClient
+        return TestcontainersContext.MongoClient
             .GetDatabase(DatabaseName)
             .GetCollection<BsonDocument>(CollectionName)
-            .InsertManyAsync(documents)
-            .Wait();
+            .InsertManyAsync(documents);
     }
 
-    private static void MigrateAll(bool withVersion)
+    private static async Task QueryAllAsync(bool withVersion)
     {
         IMongoClient client = TestcontainersContext.MongoClient;
 
@@ -92,18 +85,18 @@ public class PerformanceTestOnStartup
         {
             var versionedCollection = client.GetDatabase(DatabaseName)
                 .GetCollection<TestDocumentWithTwoMigrationHighestVersion>(CollectionName);
-            var versionedResult = versionedCollection.FindAsync(_ => true).Result.ToListAsync().Result;
+            var versionedResult = await (await versionedCollection.FindAsync(_ => true)).ToListAsync();
             return;
         }
         var collection = client.GetDatabase(DatabaseName)
             .GetCollection<TestClass>(CollectionName);
-        var result = collection.FindAsync(_ => true).Result.ToListAsync().Result;
+        var result = await (await collection.FindAsync(_ => true)).ToListAsync();
     }
 
-    private static void AddDocumentsToCache()
+    private static async Task AddDocumentsToCacheAsync()
     {
-        InsertMany(DocumentCount, false);
-        MigrateAll(false);
+        await InsertDocumentsAsync(DocumentCount);
+        await QueryAllAsync(false);
     }
 
     private static void ClearCollection()
