@@ -1,7 +1,7 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Mongo.Migration.Services.Interceptors;
 using Mongo.Migration.Tests.TestDoubles;
+using MongoDB.Bson.Serialization;
 using NUnit.Framework;
 
 namespace Mongo.Migration.Tests.Services.Interceptors;
@@ -13,38 +13,38 @@ internal class MigrationInterceptorFactoryWhenCreating : IntegrationTest
     public void If_type_is_assignable_to_document_Then_interceptor_is_created()
     {
         // Arrange
-        var factory = TestcontainersContext.Provider.GetRequiredService<IMigrationInterceptorFactory>();
+        var serializerProvider = TestcontainersContext.Provider.GetRequiredService<MigrationBsonSerializerProvider>();
 
         // Act
-        var interceptor = factory.Create(typeof(TestDocumentWithOneMigration));
+        IBsonSerializer serializer = serializerProvider.GetSerializer(typeof(TestDocumentWithOneMigration));
 
         // Assert
-        interceptor.ValueType.Should().Be<TestDocumentWithOneMigration>();
+        Assert.That(serializer, Is.TypeOf(typeof(MigrationInterceptor<TestDocumentWithOneMigration>)));
     }
 
     [Test]
-    public void If_type_is_not_assignable_to_document_Then_exception_is_thrown()
+    public void If_type_is_not_assignable_to_document_Then_null_returned()
     {
         // Arrange
-        var factory = TestcontainersContext.Provider.GetRequiredService<IMigrationInterceptorFactory>();
+        var serializerProvider = TestcontainersContext.Provider.GetRequiredService<MigrationBsonSerializerProvider>();
 
         // Act
-        Action act = () => factory.Create(typeof(TestClass));
+        IBsonSerializer serializer = serializerProvider.GetSerializer(typeof(TestClass));
 
         // Assert
-        act.Should().ThrowExactly<ArgumentException>();
+        Assert.That(serializer, Is.Null);
     }
 
     [Test]
-    public void If_type_is_null_Then_exception_is_thrown()
+    public void If_type_is_null_Then_null_returned()
     {
         // Arrange
-        var factory = TestcontainersContext.Provider.GetRequiredService<IMigrationInterceptorFactory>();
+        var serializerProvider = TestcontainersContext.Provider.GetRequiredService<MigrationBsonSerializerProvider>();
 
         // Act
-        Action act = () => factory.Create(null!);
+        IBsonSerializer serializer = serializerProvider.GetSerializer(null!);
 
         // Assert
-        act.Should().ThrowExactly<ArgumentNullException>();
+        Assert.That(serializer, Is.Null);
     }
 }

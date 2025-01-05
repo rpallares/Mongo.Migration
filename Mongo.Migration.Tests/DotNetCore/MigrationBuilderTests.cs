@@ -51,12 +51,8 @@ internal class MigrationBuilderTests
             Assert.That(startupSettings.DatabaseMigrationEnabled, Is.False);
             Assert.That(startupSettings.StartupDocumentMigrationEnabled, Is.False);
 
-            Assert.That(
-                provider.GetRequiredService<IMigrationService>(),
-                Is.TypeOf<MigrationService>());
-            Assert.That(
-                provider.GetRequiredService<IMigrationInterceptorProvider>(),
-                Is.TypeOf<MigrationInterceptorProvider>());
+            Assert.That(provider.GetRequiredService<IMigrationService>(), Is.TypeOf<MigrationService>());
+            Assert.DoesNotThrow(() => provider.GetRequiredService<MigrationBsonSerializerProvider>());
 
             Assert.Throws<InvalidOperationException>(() => provider.GetRequiredService<ICollectionLocator>());
             Assert.Throws<InvalidOperationException>(() => provider.GetRequiredService<IStartUpDocumentMigrationRunner>());
@@ -88,10 +84,9 @@ internal class MigrationBuilderTests
                 provider.GetRequiredService<IDatabaseMigrationRunner>(),
                 Is.TypeOf<DatabaseMigrationRunner>());
 
-            Assert.Throws<InvalidOperationException>(() => provider.GetRequiredService<MigrationInterceptorProvider>());
+            Assert.Throws<InvalidOperationException>(() => provider.GetRequiredService<MigrationBsonSerializerProvider>());
             Assert.Throws<InvalidOperationException>(() => provider.GetRequiredService<ICollectionLocator>());
-            Assert.Throws<InvalidOperationException>(() =>
-                provider.GetRequiredService<IStartUpDocumentMigrationRunner>());
+            Assert.Throws<InvalidOperationException>(() => provider.GetRequiredService<IStartUpDocumentMigrationRunner>());
         });
     }
 
@@ -119,7 +114,7 @@ internal class MigrationBuilderTests
                 provider.GetRequiredService<IStartUpDocumentMigrationRunner>(),
                 Is.TypeOf<StartUpDocumentMigrationRunner>());
 
-            Assert.Throws<InvalidOperationException>(() => provider.GetRequiredService<MigrationInterceptorProvider>());
+            Assert.Throws<InvalidOperationException>(() => provider.GetRequiredService<MigrationBsonSerializerProvider>());
             Assert.Throws<InvalidOperationException>(() => provider.GetRequiredService<IDatabaseMigrationRunner>());
         });
     }

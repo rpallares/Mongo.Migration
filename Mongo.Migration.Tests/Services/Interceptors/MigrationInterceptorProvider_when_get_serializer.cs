@@ -13,10 +13,10 @@ internal class MigrationInterceptorProviderWhenGetSerializer : IntegrationTest
     public void When_entity_is_document_Then_provide_serializer()
     {
         // Arrange 
-        var provider = TestcontainersContext.Provider.GetRequiredService<IMigrationInterceptorProvider>();
+        var serializationProvider = TestcontainersContext.Provider.GetRequiredService<MigrationBsonSerializerProvider>();
 
         // Act
-        var serializer = provider.GetSerializer(typeof(TestDocumentWithOneMigration));
+        var serializer = serializationProvider.GetSerializer(typeof(TestDocumentWithOneMigration));
 
         // Assert
         serializer.ValueType.Should().Be(typeof(TestDocumentWithOneMigration));
@@ -26,10 +26,10 @@ internal class MigrationInterceptorProviderWhenGetSerializer : IntegrationTest
     public void When_entity_is_not_document_Then_provide_null()
     {
         // Arrange 
-        var provider = TestcontainersContext.Provider.GetRequiredService<IMigrationInterceptorProvider>();
+        var serializationProvider = TestcontainersContext.Provider.GetRequiredService<MigrationBsonSerializerProvider>();
 
         // Act
-        var serializer = provider.GetSerializer(typeof(TestClass));
+        var serializer = serializationProvider.GetSerializer(typeof(TestClass));
 
         // Assert
         serializer.Should().BeNull();

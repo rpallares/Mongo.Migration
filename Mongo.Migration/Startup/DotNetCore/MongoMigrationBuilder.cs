@@ -37,6 +37,10 @@ public class MongoMigrationBuilder
     public MongoMigrationBuilder AddRuntimeDocumentMigration()
     {
         AddInterceptorServices();
+
+        _services
+            .AddSingleton<MigrationBsonSerializerProvider>();
+
         _mongoMigrationStartupSettings.RuntimeMigrationEnabled = true;
         return this;
     }
@@ -88,9 +92,7 @@ public class MongoMigrationBuilder
             .AddSingleton<IRuntimeVersionLocator, RuntimeVersionLocator>()
             .AddSingleton<IStartUpVersionLocator, StartUpVersionLocator>()
             .AddSingleton<IDocumentVersionService, DocumentVersionService>()
-            .AddSingleton<IDocumentMigrationRunner, DocumentMigrationRunner>()
-            .AddSingleton<IMigrationInterceptorFactory, MigrationInterceptorFactory>()
-            .AddSingleton<IMigrationInterceptorProvider, MigrationInterceptorProvider>();
+            .AddSingleton<IDocumentMigrationRunner, DocumentMigrationRunner>();
 
         _interceptorAdded = true;
     }

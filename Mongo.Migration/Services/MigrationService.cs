@@ -37,8 +37,8 @@ internal class MigrationService : IMigrationService
 
         if (_startupSettings.RuntimeMigrationEnabled)
         {
-            IMigrationInterceptorProvider migrationInterceptorProvider = _provider.GetRequiredService<IMigrationInterceptorProvider>();
-            BsonSerializer.RegisterSerializationProvider(migrationInterceptorProvider);
+            MigrationBsonSerializerProvider migrationSerializerProvider = _provider.GetRequiredService<MigrationBsonSerializerProvider>();
+            BsonSerializer.RegisterSerializationProvider(migrationSerializerProvider);
         }
     }
 
