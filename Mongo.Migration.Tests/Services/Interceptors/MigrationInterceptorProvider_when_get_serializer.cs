@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using Mongo.Migration.Services.Interceptors;
+using Mongo.Migration.Bson;
 using Mongo.Migration.Tests.TestDoubles;
 using NUnit.Framework;
 

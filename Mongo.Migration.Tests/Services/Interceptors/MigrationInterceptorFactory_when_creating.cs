@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Mongo.Migration.Services.Interceptors;
+using Mongo.Migration.Bson;
 using Mongo.Migration.Tests.TestDoubles;
 using MongoDB.Bson.Serialization;
 using NUnit.Framework;
@@ -19,7 +19,7 @@ internal class MigrationInterceptorFactoryWhenCreating : IntegrationTest
         IBsonSerializer serializer = serializerProvider.GetSerializer(typeof(TestDocumentWithOneMigration));
 
         // Assert
-        Assert.That(serializer, Is.TypeOf(typeof(MigrationInterceptor<TestDocumentWithOneMigration>)));
+        Assert.That(serializer, Is.TypeOf(typeof(MigrationSerializer<TestDocumentWithOneMigration>)));
     }
 
     [Test]

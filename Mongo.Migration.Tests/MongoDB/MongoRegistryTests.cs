@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Mongo.Migration.Bson;
 using Mongo.Migration.Documents;
 using Mongo.Migration.Documents.Serializers;
 using Mongo.Migration.Services;
-using Mongo.Migration.Services.Interceptors;
 using Mongo.Migration.Tests.TestDoubles;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -29,7 +29,7 @@ internal class MongoRegistryTests : IntegrationTest
     {
         Assert.That(
             BsonSerializer.SerializerRegistry.GetSerializer<TestDocumentWithOneMigration>(),
-            Is.TypeOf<MigrationInterceptor<TestDocumentWithOneMigration>>());
+            Is.TypeOf<MigrationSerializer<TestDocumentWithOneMigration>>());
     }
 
     [Test]

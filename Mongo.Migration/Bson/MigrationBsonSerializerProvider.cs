@@ -1,12 +1,13 @@
 ﻿using Mongo.Migration.Documents;
 using Mongo.Migration.Migrations.Document;
+using Mongo.Migration.Services;
 using MongoDB.Bson.Serialization;
 
-namespace Mongo.Migration.Services.Interceptors;
+namespace Mongo.Migration.Bson;
 
 internal sealed class MigrationBsonSerializerProvider : IRegistryAwareBsonSerializationProvider
 {
-    private static readonly Type s_migrationInterceptorGenericType = typeof(MigrationInterceptor<>);
+    private static readonly Type s_migrationSerializerGenericType = typeof(MigrationSerializer<>);
     private static readonly Type s_iDocumentType = typeof(IDocument);
 
     private readonly IDocumentVersionService _documentVersionService;
@@ -32,8 +33,8 @@ internal sealed class MigrationBsonSerializerProvider : IRegistryAwareBsonSerial
             return null!;
         }
 
-        var genericType = s_migrationInterceptorGenericType.MakeGenericType(type);
-        return (IBsonSerializer) Activator.CreateInstance(genericType, _migrationRunner, _documentVersionService)!;
+        var genericType = s_migrationSerializerGenericType.MakeGenericType(type);
+        return (IBsonSerializer)Activator.CreateInstance(genericType, _migrationRunner, _documentVersionService)!;
     }
 
     private static bool ShouldBeMigrated(Type type)
