@@ -18,9 +18,4 @@ public interface IDocumentVersionService
 
     void DetermineVersion<TClass>(TClass instance)
         where TClass : IDocument;
-
-    DocumentVersion DetermineLastVersion(
-        in DocumentVersion version,
-        List<IDocumentMigration> migrations,
-        int currentMigration);
 }

@@ -21,7 +21,7 @@ internal class RuntimeVersionLocator : AbstractLocator<DocumentVersion, Type>, I
             from a in AppDomain.CurrentDomain.GetAssemblies()
             from t in a.GetTypes()
             let attributes = t.GetCustomAttributes(typeof(RuntimeVersion), true)
-            where attributes != null && attributes.Length > 0
+            where attributes is {Length: > 0}
             select new { Type = t, Attributes = attributes.Cast<RuntimeVersion>() };
 
         var versions = new Dictionary<Type, DocumentVersion>();

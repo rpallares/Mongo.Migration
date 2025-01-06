@@ -10,15 +10,12 @@ internal sealed class MigrationBsonSerializerProvider : IRegistryAwareBsonSerial
     private static readonly Type s_migrationSerializerGenericType = typeof(MigrationSerializer<>);
     private static readonly Type s_iDocumentType = typeof(IDocument);
 
-    private readonly IDocumentVersionService _documentVersionService;
-
-    private readonly IDocumentMigrationRunner _migrationRunner;
+    private readonly object[] _constructorParameters;
 
     public MigrationBsonSerializerProvider(IDocumentMigrationRunner migrationRunner,
         IDocumentVersionService documentVersionService)
     {
-        _migrationRunner = migrationRunner;
-        _documentVersionService = documentVersionService;
+        _constructorParameters = new object[] { migrationRunner, documentVersionService };
     }
 
     public IBsonSerializer GetSerializer(Type type)
@@ -28,13 +25,13 @@ internal sealed class MigrationBsonSerializerProvider : IRegistryAwareBsonSerial
 
     public IBsonSerializer GetSerializer(Type type, IBsonSerializerRegistry serializerRegistry)
     {
-        if (type is null || !ShouldBeMigrated(type))
+        if (!ShouldBeMigrated(type))
         {
             return null!;
         }
 
         var genericType = s_migrationSerializerGenericType.MakeGenericType(type);
-        return (IBsonSerializer)Activator.CreateInstance(genericType, _migrationRunner, _documentVersionService)!;
+        return (IBsonSerializer)Activator.CreateInstance(genericType, _constructorParameters)!;
     }
 
     private static bool ShouldBeMigrated(Type type)

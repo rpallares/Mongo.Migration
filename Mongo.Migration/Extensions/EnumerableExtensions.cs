@@ -6,7 +6,7 @@ namespace Mongo.Migration.Extensions;
 
 internal static class EnumerableExtensions
 {
-    internal static IEnumerable<TMigrationType> CheckForDuplicates<TMigrationType>(this IEnumerable<TMigrationType> list)
+    private static IEnumerable<TMigrationType> CheckForDuplicates<TMigrationType>(this IEnumerable<TMigrationType> list)
         where TMigrationType : IMigration
     {
         var uniqueHashes = new HashSet<DocumentVersion>();

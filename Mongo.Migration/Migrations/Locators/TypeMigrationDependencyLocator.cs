@@ -33,7 +33,7 @@ internal class TypeMigrationDependencyLocator<TMigrationType> : MigrationLocator
 
         if (constructors.Length > 0)
         {
-            object[] args = constructors
+            var args = constructors
                 .First()
                 .GetParameters()
                 .Select(parameterInfo => _serviceProvider.GetRequiredService(parameterInfo.ParameterType))

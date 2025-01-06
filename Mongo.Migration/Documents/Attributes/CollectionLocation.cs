@@ -7,6 +7,6 @@ public class CollectionLocation : Attribute
 
     public CollectionLocation(string collectionName)
     {
-        CollectionInformation = new(collectionName);
+        CollectionInformation = new CollectionLocationInformation(collectionName);
     }
 }

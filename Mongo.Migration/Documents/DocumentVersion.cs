@@ -4,11 +4,11 @@ public readonly record struct DocumentVersion : IComparable<DocumentVersion>
 {
     private const char VersionSplitChar = '.';
 
-    public int Major { get; init; }
+    public int Major { get; }
 
-    public int Minor { get; init; }
+    public int Minor { get; }
 
-    public int Revision { get; init; }
+    public int Revision { get; }
 
     public DocumentVersion(int major, int minor, int revision)
     {

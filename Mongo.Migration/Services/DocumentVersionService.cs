@@ -94,19 +94,6 @@ internal sealed class DocumentVersionService : IDocumentVersionService
         throw new VersionViolationException(currentVersion, documentVersion, latestVersion);
     }
 
-    public DocumentVersion DetermineLastVersion(
-        in DocumentVersion version,
-        List<IDocumentMigration> migrations,
-        int currentMigration)
-    {
-        if (migrations.Last() != migrations[currentMigration])
-        {
-            return migrations[currentMigration + 1].Version;
-        }
-
-        return version;
-    }
-
     private DocumentVersion? GetCurrentVersion(Type type)
     {
         return _runtimeVersionLocator.GetLocateOrNull(type);

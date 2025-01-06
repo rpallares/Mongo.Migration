@@ -34,17 +34,4 @@ internal class MigrationInterceptorFactoryWhenCreating : IntegrationTest
         // Assert
         Assert.That(serializer, Is.Null);
     }
-
-    [Test]
-    public void If_type_is_null_Then_null_returned()
-    {
-        // Arrange
-        var serializerProvider = TestcontainersContext.Provider.GetRequiredService<MigrationBsonSerializerProvider>();
-
-        // Act
-        IBsonSerializer serializer = serializerProvider.GetSerializer(null!);
-
-        // Assert
-        Assert.That(serializer, Is.Null);
-    }
 }

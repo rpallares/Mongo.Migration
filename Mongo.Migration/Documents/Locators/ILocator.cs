@@ -1,6 +1,6 @@
 namespace Mongo.Migration.Documents.Locators;
 
-public interface ILocator<TReturnType, TTypeIdentifier>
+public interface ILocator<TReturnType, in TTypeIdentifier>
     where TReturnType : struct
     where TTypeIdentifier : class
 {
