@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Mongo.Migration.Migrations.Document;
 using Mongo.Migration.Tests.TestDoubles;
 using MongoDB.Bson;
@@ -25,8 +24,8 @@ internal class DocumentMigrationRunnerWhenMigratingDown : IntegrationTest
         runner.Run(typeof(TestDocumentWithTwoMigration), document);
 
         // Assert
-        document.Names.ToList()[1].Should().Be("Dors");
-        document.Values.ToList()[0].AsString.Should().Be("0.0.0");
+        Assert.That(document.Names.ToList()[1], Is.EqualTo("Dors"));
+        Assert.That(document.Values.ToList()[0].AsString, Is.EqualTo("0.0.0"));
     }
 
     [Test]
@@ -44,7 +43,7 @@ internal class DocumentMigrationRunnerWhenMigratingDown : IntegrationTest
         runner.Run(typeof(TestDocumentWithTwoMigrationMiddleVersion), document);
 
         // Assert
-        document.Names.ToList()[1].Should().Be("Doors1");
-        document.Values.ToList()[0].AsString.Should().Be("0.0.1");
+        Assert.That(document.Names.ToList()[1], Is.EqualTo("Doors1"));
+        Assert.That(document.Values.ToList()[0].AsString, Is.EqualTo("0.0.1"));
     }
 }

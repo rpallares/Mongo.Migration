@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Mongo.Migration.Documents;
+﻿using Mongo.Migration.Documents;
 using NUnit.Framework;
 
 namespace Mongo.Migration.Tests.Documents;
@@ -14,7 +13,7 @@ public class DocumentWhenCreating
         IDocument document = new Document();
 
         // Assert
-        document.Should().BeOfType<Document>();
+        Assert.That(document, Is.TypeOf<Document>());
     }
 
     [Test]
@@ -27,6 +26,6 @@ public class DocumentWhenCreating
         var version = document.Version;
 
         // Assert
-        version.ToString().Should().Be("0.0.0");
+        Assert.That(version.ToString(), Is.EqualTo("0.0.0"));
     }
 }

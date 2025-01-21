@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.Logging.Abstractions;
+﻿using Microsoft.Extensions.Logging.Abstractions;
 using Mongo.Migration.Documents;
 using Mongo.Migration.Migrations.Locators;
 using Mongo.Migration.Tests.TestDoubles;
@@ -26,7 +25,7 @@ public class TypeMigrationLocatorWhenLocate
         var result = _locator.GetMigrations(typeof(TestDocumentWithOneMigration));
 
         // Assert
-        result.Count.Should().Be(1);
+        Assert.That(result, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -36,7 +35,7 @@ public class TypeMigrationLocatorWhenLocate
         var result = _locator.GetMigrations(typeof(TestDocumentWithTwoMigration));
 
         // Assert
-        result.Count.Should().Be(2);
+        Assert.That(result, Has.Count.EqualTo(2));
     }
 
     [Test]
@@ -46,7 +45,7 @@ public class TypeMigrationLocatorWhenLocate
         var version = _locator.GetLatestVersion(typeof(TestDocumentWithTwoMigration));
 
         // Assert
-        version.ToString().Should().Be("0.0.2");
+        Assert.That(version.ToString(), Is.EqualTo("0.0.2"));
     }
 
     [Test]
@@ -57,8 +56,8 @@ public class TypeMigrationLocatorWhenLocate
             .GetMigrationsFromTo(typeof(TestDocumentWithTwoMigration), DocumentVersion.Default, DocumentVersion.Parse("0.0.1"))
             .ToList();
         // Assert
-        result.Should().HaveCount(1);
-        result[0].Should().BeOfType<TestDocumentWithTwoMigration001>();
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0], Is.TypeOf<TestDocumentWithTwoMigration001>());
     }
 
     [Test]
@@ -69,7 +68,7 @@ public class TypeMigrationLocatorWhenLocate
             .GetMigrationsFromToDown(typeof(TestDocumentWithTwoMigration), DocumentVersion.Parse("0.0.2"), DocumentVersion.Parse("0.0.1"))
             .ToList();
         // Assert
-        result.Should().HaveCount(1);
-        result[0].Should().BeOfType<TestDocumentWithTwoMigration002>();
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0], Is.TypeOf<TestDocumentWithTwoMigration002>());
     }
 }

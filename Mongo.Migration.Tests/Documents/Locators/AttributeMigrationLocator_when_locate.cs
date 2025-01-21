@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Mongo.Migration.Documents.Locators;
+﻿using Mongo.Migration.Documents.Locators;
 using Mongo.Migration.Tests.TestDoubles;
 using NUnit.Framework;
 
@@ -18,7 +17,7 @@ internal class VersionLocatorWhenLocate
         var currentVersion = locator.GetLocateOrNull(typeof(TestDocumentWithOneMigration));
 
         // Assert
-        currentVersion.ToString().Should().Be("0.0.1");
+        Assert.That(currentVersion.ToString(), Is.EqualTo("0.0.1"));
     }
 
     [Test]
@@ -31,6 +30,6 @@ internal class VersionLocatorWhenLocate
         var currentVersion = locator.GetLocateOrNull(typeof(TestDocumentWithoutAttribute));
 
         // Assert
-        currentVersion.Should().BeNull();
+        Assert.That(currentVersion, Is.Null);
     }
 }

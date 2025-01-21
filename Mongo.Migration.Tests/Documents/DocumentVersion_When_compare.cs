@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Mongo.Migration.Documents;
+﻿using Mongo.Migration.Documents;
 using NUnit.Framework;
 
 namespace Mongo.Migration.Tests.Documents;
@@ -18,7 +17,7 @@ public class DocumentVersionWhenCompare
     {
         bool result = _higherVersion <= _lowerVersion;
 
-        result.Should().BeFalse();
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -26,7 +25,7 @@ public class DocumentVersionWhenCompare
     {
         bool result = _lowerVersion > _higherVersion;
 
-        result.Should().BeFalse();
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -34,7 +33,7 @@ public class DocumentVersionWhenCompare
     {
         bool result = _lowerVersion >= _equalLowerVersion;
 
-        result.Should().BeTrue();
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -42,7 +41,7 @@ public class DocumentVersionWhenCompare
     {
         bool result = _lowerVersion >= _higherVersion;
 
-        result.Should().BeFalse();
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -50,7 +49,7 @@ public class DocumentVersionWhenCompare
     {
         bool result = _lowerVersion < _higherVersion;
 
-        result.Should().BeTrue();
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -58,6 +57,6 @@ public class DocumentVersionWhenCompare
     {
         bool result = _lowerVersion <= _equalLowerVersion;
 
-        result.Should().BeTrue();
+        Assert.That(result, Is.True);
     }
 }

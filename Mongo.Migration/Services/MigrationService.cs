@@ -6,7 +6,7 @@ using Mongo.Migration.Documents;
 using Mongo.Migration.Documents.Serializers;
 using Mongo.Migration.Migrations.Database;
 using Mongo.Migration.Migrations.Document;
-using Mongo.Migration.Startup.DotNetCore;
+using Mongo.Migration.Startup;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 

@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Mongo.Migration.Migrations.Database;
+﻿using Mongo.Migration.Migrations.Database;
 using Mongo.Migration.Tests.TestDoubles.Database;
 using NUnit.Framework;
 
@@ -15,7 +14,7 @@ public class DatabaseMigrationWhenCreating
         var migration = new TestDatabaseMigration001();
 
         // Assert
-        migration.Type.Should().Be(typeof(DatabaseMigration));
+        Assert.That(migration.Type, Is.EqualTo(typeof(DatabaseMigration)));
     }
 
     [Test]
@@ -25,7 +24,7 @@ public class DatabaseMigrationWhenCreating
         var migration = new TestDatabaseMigration001();
 
         // Assert
-        migration.Version.ToString().Should().Be("0.0.1");
+        Assert.That(migration.Version.ToString(), Is.EqualTo("0.0.1"));
     }
 
     [Test]
@@ -35,6 +34,6 @@ public class DatabaseMigrationWhenCreating
         var migration = new TestDatabaseMigration001();
 
         // Assert
-        migration.Should().BeOfType<TestDatabaseMigration001>();
+        Assert.That(migration, Is.TypeOf<TestDatabaseMigration001>());
     }
 }

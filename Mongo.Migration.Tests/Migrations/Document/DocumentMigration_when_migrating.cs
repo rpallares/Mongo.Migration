@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Mongo.Migration.Tests.TestDoubles;
+﻿using Mongo.Migration.Tests.TestDoubles;
 using MongoDB.Bson;
 using NUnit.Framework;
 
@@ -19,7 +18,7 @@ public class DocumentMigrationWhenMigrating
         migration.Down(document);
 
         // Assert
-        document.Should().BeEquivalentTo(new BsonDocument { { "Dors", 3 } });
+        Assert.That(document, Is.EquivalentTo(new BsonDocument { { "Dors", 3 } }));
     }
 
     [Test]
@@ -33,6 +32,6 @@ public class DocumentMigrationWhenMigrating
         migration.Up(document);
 
         // Assert
-        document.Should().BeEquivalentTo(new BsonDocument { { "Doors", 3 } });
+        Assert.That(document, Is.EquivalentTo(new BsonDocument { { "Doors", 3 } }));
     }
 }

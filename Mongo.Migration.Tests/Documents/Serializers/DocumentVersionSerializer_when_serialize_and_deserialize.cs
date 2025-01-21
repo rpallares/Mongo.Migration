@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Mongo.Migration.Documents;
+﻿using Mongo.Migration.Documents;
 using Mongo.Migration.Documents.Serializers;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
@@ -26,9 +25,9 @@ public class DocumentVersionSerializerWhenSerializeAndDeserialize
         // Act 
         DocumentVersion result = _serializer.Deserialize(context, args);
 
-        // Assert 
-        result.Should().BeOfType<DocumentVersion>();
-        result.ToString().Should().Be("0.1.1");
+        // Assert
+        Assert.That(result, Is.TypeOf<DocumentVersion>());
+        Assert.That(result.ToString(), Is.EqualTo("0.1.1"));
     }
 
     [Test]
@@ -45,7 +44,7 @@ public class DocumentVersionSerializerWhenSerializeAndDeserialize
 
         // Assert 
         BsonDocument document = writer.Document;
-        document.ToString().Should().Be("{ \"version\" : \"0.0.1\" }");
+        Assert.That(document.ToString(), Is.EqualTo("{ \"version\" : \"0.0.1\" }"));
     }
 
     [SetUp]

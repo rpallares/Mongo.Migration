@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Mongo.Migration.Migrations.Document;
 using Mongo.Migration.Tests.TestDoubles;
 using MongoDB.Bson;
@@ -25,8 +24,8 @@ internal class DocumentMigrationRunnerWhenMigratingUp : IntegrationTest
         runner.Run(typeof(TestDocumentWithTwoMigrationHighestVersion), document);
 
         // Assert
-        document.Names.ToList()[1].Should().Be("Door");
-        document.Values.ToList()[0].AsString.Should().Be("0.0.2");
+        Assert.That(document.Names.ToList()[1], Is.EqualTo("Door"));
+        Assert.That(document.Values.ToList()[0].AsString, Is.EqualTo("0.0.2"));
     }
 
     [Test]
@@ -43,8 +42,8 @@ internal class DocumentMigrationRunnerWhenMigratingUp : IntegrationTest
         runner.Run(typeof(TestDocumentWithTwoMigrationHighestVersion), document);
 
         // Assert
-        document["Door"].AsInt32.Should().Be(3);
-        document["Version"].AsString.Should().Be("0.0.2");
+        Assert.That(document["Door"].AsInt32, Is.EqualTo(3));
+        Assert.That(document["Version"].AsString, Is.EqualTo("0.0.2"));
     }
 
     [Test]
@@ -62,7 +61,8 @@ internal class DocumentMigrationRunnerWhenMigratingUp : IntegrationTest
         runner.Run(typeof(TestDocumentWithTwoMigrationHighestVersion), document);
 
         // Assert
-        document.Names.ToList()[1].Should().Be("Door");
-        document.Values.ToList()[0].AsString.Should().Be("0.0.2");
+
+        Assert.That(document.Names.ToList()[1], Is.EqualTo("Door"));
+        Assert.That(document.Values.ToList()[0].AsString, Is.EqualTo("0.0.2"));
     }
 }

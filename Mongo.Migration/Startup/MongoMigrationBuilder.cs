@@ -6,7 +6,7 @@ using Mongo.Migration.Migrations.Document;
 using Mongo.Migration.Migrations.Locators;
 using Mongo.Migration.Services;
 
-namespace Mongo.Migration.Startup.DotNetCore;
+namespace Mongo.Migration.Startup;
 
 public class MongoMigrationBuilder
 {
@@ -48,7 +48,7 @@ public class MongoMigrationBuilder
     public MongoMigrationBuilder AddStartupDocumentMigration()
     {
         AddInterceptorServices();
-        
+
         _services
             .AddTransient<ICollectionLocator, CollectionLocator>()
             .AddTransient<IStartUpDocumentMigrationRunner, StartUpDocumentMigrationRunner>();
@@ -72,11 +72,11 @@ public class MongoMigrationBuilder
 
     public void AddAllMigrationsIfNothingWasAdded()
     {
-        if (_mongoMigrationStartupSettings is {RuntimeMigrationEnabled: false, StartupDocumentMigrationEnabled: false, DatabaseMigrationEnabled: false})
+        if (_mongoMigrationStartupSettings is { RuntimeMigrationEnabled: false, StartupDocumentMigrationEnabled: false, DatabaseMigrationEnabled: false })
         {
-                AddRuntimeDocumentMigration();
-                AddDatabaseMigration();
-                AddStartupDocumentMigration();
+            AddRuntimeDocumentMigration();
+            AddDatabaseMigration();
+            AddStartupDocumentMigration();
         }
     }
 

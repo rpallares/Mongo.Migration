@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Mongo.Migration.Documents;
+﻿using Mongo.Migration.Documents;
 using NUnit.Framework;
 
 namespace Mongo.Migration.Tests.Documents;
@@ -11,8 +10,7 @@ public class DocumentVersionWhenCasting
     public void If_implicit_string_to_version_Then_cast_should_work()
     {
         DocumentVersion version = new DocumentVersion(1,0,2);
-
-        version.ToString().Should().Be("1.0.2");
+        Assert.That(version == "1.0.2", Is.True);
     }
 
     [Test]
@@ -21,7 +19,6 @@ public class DocumentVersionWhenCasting
         var version = new DocumentVersion(1,0,2);
 
         string versionString = version.ToString();
-
-        versionString.Should().Be("1.0.2");
+        Assert.That(versionString, Is.EqualTo("1.0.2"));
     }
 }

@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Mongo.Migration.Bson;
 using Mongo.Migration.Tests.TestDoubles;
 using NUnit.Framework;
@@ -19,7 +18,7 @@ internal class MigrationInterceptorProviderWhenGetSerializer : IntegrationTest
         var serializer = serializationProvider.GetSerializer(typeof(TestDocumentWithOneMigration));
 
         // Assert
-        serializer.ValueType.Should().Be(typeof(TestDocumentWithOneMigration));
+        Assert.That(serializer.ValueType, Is.EqualTo(typeof(TestDocumentWithOneMigration)));
     }
 
     [Test]
@@ -32,6 +31,6 @@ internal class MigrationInterceptorProviderWhenGetSerializer : IntegrationTest
         var serializer = serializationProvider.GetSerializer(typeof(TestClass));
 
         // Assert
-        serializer.Should().BeNull();
+        Assert.That(serializer, Is.Null);
     }
 }

@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Mongo.Migration.Documents;
+﻿using Mongo.Migration.Documents;
 using NUnit.Framework;
 
 namespace Mongo.Migration.Tests.Documents;
@@ -11,8 +10,7 @@ public class DocumentVersionWhenCreating
     public void If_Empty_Then_version_is_empty_value()
     {
         DocumentVersion version = DocumentVersion.Empty;
-
-        version.ToString().Should().Be("-1.0.0");
+        Assert.That(version.ToString(), Is.EqualTo("-1.0.0"));
     }
 
     [Test]
@@ -20,70 +18,58 @@ public class DocumentVersionWhenCreating
     {
         DocumentVersion version = DocumentVersion.Default;
 
-        version.ToString().Should().Be("0.0.0");
+        Assert.That(version.ToString(), Is.EqualTo("0.0.0"));
     }
 
     [Test]
     public void If_first_part_contains_char_Then_exception_is_thrown()
     {
-        Action act = () => DocumentVersion.Parse("a.0.0");
-
-        act.Should().Throw<FormatException>();
+        Assert.Throws<FormatException>(() => DocumentVersion.Parse("a.0.0"));
     }
 
     [Test]
     public void If_new_version_with_int_Then_version_string_should_be_same()
     {
         var version = new DocumentVersion(1, 0, 2);
-
-        version.ToString().Should().Be("1.0.2");
+        Assert.That(version.ToString(), Is.EqualTo("1.0.2"));
     }
 
     [Test]
     public void If_new_version_with_string_Then_version_string_should_be_same()
     {
         var version = DocumentVersion.Parse("1.0.2");
-
-        version.ToString().Should().Be("1.0.2");
+        Assert.That(version.ToString(), Is.EqualTo("1.0.2"));
     }
 
     [Test]
     public void If_second_part_contains_char_Then_exception_is_thrown()
     {
-        Action act = () => DocumentVersion.Parse("0.a.0");
-
-        act.Should().Throw<FormatException>();
+        Assert.Throws<FormatException>(() => DocumentVersion.Parse("0.a.0"));
     }
 
     [Test]
     public void If_third_part_contains_char_Then_exception_is_thrown()
     {
-        Action act = () => DocumentVersion.Parse("0.0.a");
-
-        act.Should().Throw<FormatException>();
+        Assert.Throws<FormatException>(() => DocumentVersion.Parse("0.0.a"));
     }
 
     [Test]
     public void If_version_string_is_too_long_Then_exception_is_thrown()
     {
-        Action act = () => DocumentVersion.Parse("0.0.0.0");
-
-        act.Should().Throw<IndexOutOfRangeException>();
+        Assert.Throws<IndexOutOfRangeException>(() => DocumentVersion.Parse("0.0.0.0"));
     }
 
     [Test]
     public void If_version_string_is_too_short1_then_default()
     {
         var version = DocumentVersion.Parse("33");
-
-        version.ToString().Should().Be("33.0.0");
+        Assert.That(version.ToString(), Is.EqualTo("33.0.0"));
     }
 
     [Test]
     public void If_version_string_is_too_short2_then_default()
     {
         var version = DocumentVersion.Parse("42.27");
-
-        version.ToString().Should().Be("42.27.0");
+        Assert.That(version.ToString(), Is.EqualTo("42.27.0"));
     }
 }

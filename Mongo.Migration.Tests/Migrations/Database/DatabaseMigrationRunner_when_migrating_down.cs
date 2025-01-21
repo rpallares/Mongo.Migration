@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Mongo.Migration.Documents;
 using Mongo.Migration.Migrations.Database;
 using Mongo.Migration.Tests.TestDoubles.Database;
@@ -30,7 +29,7 @@ internal class DatabaseMigrationRunnerWhenMigratingDown : DatabaseIntegrationTes
 
         // Assert
         var migrations = GetMigrationHistory();
-        migrations.Should().BeEmpty();
+        Assert.That(migrations, Is.Empty);
     }
 
     [Test]
@@ -52,8 +51,8 @@ internal class DatabaseMigrationRunnerWhenMigratingDown : DatabaseIntegrationTes
         runner.Run(Db, new DocumentVersion(0, 0, 1));
 
         // Assert
-        var migrations = GetMigrationHistory();
-        migrations.Should().NotBeEmpty();
-        migrations.Should().OnlyContain(m => m.Version == new DocumentVersion(0, 0, 1));
+        List<MigrationHistory> migrations = GetMigrationHistory();
+        Assert.That(migrations, Is.Not.Empty);
+        Assert.That(migrations, Has.One.Matches<MigrationHistory>(m => m.Version == new DocumentVersion(0, 0, 1)));
     }
 }

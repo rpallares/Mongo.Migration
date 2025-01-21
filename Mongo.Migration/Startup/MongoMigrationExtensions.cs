@@ -1,7 +1,6 @@
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Mongo.Migration.Services;
-namespace Mongo.Migration.Startup.DotNetCore;
+namespace Mongo.Migration.Startup;
 
 public static class MongoMigrationExtensions
 {
@@ -18,9 +17,8 @@ public static class MongoMigrationExtensions
         return services;
     }
 
-    public static async Task InitializeAndMigrateAsync(this IApplicationBuilder app, string databaseName, string? targetDatabaseVersion)
+    public static async Task InitializeAndMigrateAsync(this IMigrationService migrationService, string databaseName, string? targetDatabaseVersion)
     {
-        IMigrationService migrationService = app.ApplicationServices.GetRequiredService<IMigrationService>();
         migrationService.RegisterBsonStatics();
 
         await migrationService.MigrateAsync(databaseName, targetDatabaseVersion);

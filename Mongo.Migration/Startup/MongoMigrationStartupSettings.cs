@@ -1,4 +1,4 @@
-﻿namespace Mongo.Migration.Startup.DotNetCore;
+﻿namespace Mongo.Migration.Startup;
 
 internal class MongoMigrationStartupSettings
 {

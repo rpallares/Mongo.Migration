@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Mongo.Migration.Documents;
 using Mongo.Migration.Exceptions;
 using Mongo.Migration.Services;
@@ -22,7 +21,7 @@ internal class DocumentVersionServiceWhenDetermineVersion : IntegrationTest
         service.DetermineVersion(document);
 
         // Assert
-        document.Version.ToString().Should().Be("0.0.1");
+        Assert.That(document.Version.ToString(), Is.EqualTo("0.0.1"));
     }
 
     [Test]
@@ -36,7 +35,7 @@ internal class DocumentVersionServiceWhenDetermineVersion : IntegrationTest
         service.DetermineVersion(document);
 
         // Assert
-        document.Version.ToString().Should().Be("0.0.2");
+        Assert.That(document.Version.ToString(), Is.EqualTo("0.0.2"));
     }
 
     [Test]
@@ -46,10 +45,7 @@ internal class DocumentVersionServiceWhenDetermineVersion : IntegrationTest
         IDocumentVersionService service = TestcontainersContext.Provider.GetRequiredService<IDocumentVersionService>();
         var document = new TestDocumentWithTwoMigrationHighestVersion { Version = new DocumentVersion(0,0,1) };
 
-        // Act// Act
-        Action checkAction = () => { service.DetermineVersion(document); };
-
         // Assert
-        checkAction.Should().Throw<VersionViolationException>();
+        Assert.Throws<VersionViolationException>(() => service.DetermineVersion(document));
     }
 }

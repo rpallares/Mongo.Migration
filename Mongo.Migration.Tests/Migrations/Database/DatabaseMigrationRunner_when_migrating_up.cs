@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Mongo.Migration.Documents;
 using Mongo.Migration.Migrations.Database;
 using Mongo.Migration.Tests.TestDoubles.Database;
@@ -22,10 +21,10 @@ internal class DatabaseMigrationRunnerWhenMigratingUp : DatabaseIntegrationTest
 
         // Assert
         var migrations = GetMigrationHistory();
-        migrations.Should().NotBeEmpty();
-        migrations[0].Version.ToString().Should().BeEquivalentTo("0.0.1");
-        migrations[1].Version.ToString().Should().BeEquivalentTo("0.0.2");
-        migrations[2].Version.ToString().Should().BeEquivalentTo("0.0.3");
+        Assert.That(migrations, Is.Not.Empty);
+        Assert.That(migrations[0].Version.ToString(), Is.EqualTo("0.0.1"));
+        Assert.That(migrations[1].Version.ToString(), Is.EqualTo("0.0.2"));
+        Assert.That(migrations[2].Version.ToString(), Is.EqualTo("0.0.3"));
     }
 
     [Test]
@@ -41,8 +40,8 @@ internal class DatabaseMigrationRunnerWhenMigratingUp : DatabaseIntegrationTest
 
         // Assert
         var migrations = GetMigrationHistory();
-        migrations.Should().NotBeEmpty();
-        migrations[2].Version.ToString().Should().BeEquivalentTo("0.0.3");
+        Assert.That(migrations, Is.Not.Empty);
+        Assert.That(migrations[2].Version.ToString(), Is.EqualTo("0.0.3"));
     }
 
     [Test]
@@ -58,9 +57,11 @@ internal class DatabaseMigrationRunnerWhenMigratingUp : DatabaseIntegrationTest
 
         // Assert
         var migrations = GetMigrationHistory();
-        migrations.Should().NotBeEmpty();
-        migrations[0].Version.ToString().Should().BeEquivalentTo("0.0.1");
-        migrations[1].Version.ToString().Should().BeEquivalentTo("0.0.2");
-        migrations[2].Version.ToString().Should().BeEquivalentTo("0.0.3");
+
+
+        Assert.That(migrations, Is.Not.Empty);
+        Assert.That(migrations[0].Version.ToString(), Is.EqualTo("0.0.1"));
+        Assert.That(migrations[1].Version.ToString(), Is.EqualTo("0.0.2"));
+        Assert.That(migrations[2].Version.ToString(), Is.EqualTo("0.0.3"));
     }
 }

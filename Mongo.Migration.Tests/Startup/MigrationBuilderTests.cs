@@ -6,11 +6,11 @@ using Mongo.Migration.Documents.Locators;
 using Mongo.Migration.Migrations.Database;
 using Mongo.Migration.Migrations.Document;
 using Mongo.Migration.Services;
-using Mongo.Migration.Startup.DotNetCore;
+using Mongo.Migration.Startup;
 using MongoDB.Driver;
 using NUnit.Framework;
 
-namespace Mongo.Migration.Tests.DotNetCore;
+namespace Mongo.Migration.Tests.Startup;
 
 [TestFixture]
 internal class MigrationBuilderTests

@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Mongo.Migration.Tests.TestDoubles;
+﻿using Mongo.Migration.Tests.TestDoubles;
 using NUnit.Framework;
 
 namespace Mongo.Migration.Tests.Migrations.Document;
@@ -14,7 +13,7 @@ public class DocumentMigrationWhenCreating
         var migration = new TestDocumentWithOneMigration001();
 
         // Assert
-        migration.Type.Should().Be(typeof(TestDocumentWithOneMigration));
+        Assert.That(migration.Type, Is.EqualTo(typeof(TestDocumentWithOneMigration)));
     }
 
     [Test]
@@ -24,7 +23,7 @@ public class DocumentMigrationWhenCreating
         var migration = new TestDocumentWithOneMigration001();
 
         // Assert
-        migration.Version.ToString().Should().Be("0.0.1");
+        Assert.That(migration.Version.ToString(), Is.EqualTo("0.0.1"));
     }
 
     [Test]
@@ -34,6 +33,6 @@ public class DocumentMigrationWhenCreating
         var migration = new TestDocumentWithOneMigration001();
 
         // Assert
-        migration.Should().BeOfType<TestDocumentWithOneMigration001>();
+        Assert.That(migration, Is.TypeOf(typeof(TestDocumentWithOneMigration001)));
     }
 }

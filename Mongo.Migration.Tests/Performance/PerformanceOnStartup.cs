@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Mongo.Migration.Migrations.Document;
 using Mongo.Migration.Tests.TestDoubles;
@@ -57,7 +56,7 @@ public class PerformanceTestOnStartup
         await TestContext.Out.WriteLineAsync($"MongoDB: {sw.ElapsedMilliseconds}ms, Mongo.Migration: {swWithMigration.ElapsedMilliseconds}ms, Diff: {result}ms (Tolerance: {ToleranceMs}ms), Documents: {DocumentCount}, Migrations per Document: 2");
         
         // Assert
-        result.Should().BeLessThan(ToleranceMs);
+        Assert.That(result, Is.LessThan(ToleranceMs));
     }
 
     private static Task InsertDocumentsAsync(int documentCount)
