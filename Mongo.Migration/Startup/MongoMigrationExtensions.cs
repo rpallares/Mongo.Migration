@@ -17,10 +17,13 @@ public static class MongoMigrationExtensions
         return services;
     }
 
-    public static async Task InitializeAndMigrateAsync(this IMigrationService migrationService, string databaseName, string? targetDatabaseVersion)
+    public static async Task InitializeAndMigrateAsync(this IMigrationService migrationService,
+        string databaseName,
+        string? targetDatabaseVersion,
+        CancellationToken cancellationToken)
     {
         migrationService.RegisterBsonStatics();
 
-        await migrationService.MigrateAsync(databaseName, targetDatabaseVersion);
+        await migrationService.MigrateAsync(databaseName, targetDatabaseVersion, cancellationToken);
     }
 }

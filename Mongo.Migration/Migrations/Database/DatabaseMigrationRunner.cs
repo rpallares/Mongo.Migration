@@ -26,37 +26,38 @@ internal class DatabaseMigrationRunner : IDatabaseMigrationRunner
         _logger = logger;
     }
 
-    public void Run(IMongoDatabase db, in DocumentVersion? targetVersion = null)
+    public async Task RunAsync(IMongoDatabase db, DocumentVersion? targetVersion = null, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Database migration started.");
-        DocumentVersion databaseVersion = _databaseVersionService.GetLatestDatabaseVersion(db);
+        DocumentVersion databaseVersion = await _databaseVersionService.GetLatestDatabaseVersionAsync(db, cancellationToken);
         DocumentVersion currentOrLatest = targetVersion is not null && targetVersion > DocumentVersion.Empty
             ? targetVersion.Value
             : _databaseVersionService.GetLatestMigrationVersion();
 
         if (databaseVersion != currentOrLatest)
         {
-            MigrateUpOrDown(db, databaseVersion, currentOrLatest);
+            await MigrateUpOrDownAsync(db, databaseVersion, currentOrLatest, cancellationToken);
         }
         
         _logger.LogInformation("Database migration finished.");
     }
 
-    private void MigrateUpOrDown(
+    private async Task MigrateUpOrDownAsync(
         IMongoDatabase db,
-        in DocumentVersion databaseVersion,
-        in DocumentVersion to)
+        DocumentVersion databaseVersion,
+        DocumentVersion to,
+        CancellationToken cancellationToken)
     {
         if (databaseVersion > to)
         {
-            MigrateDown(db, databaseVersion, to);
+            await MigrateDownAsync(db, databaseVersion, to, cancellationToken);
             return;
         }
 
-        MigrateUp(db, databaseVersion, to);
+        await MigrateUpAsync(db, databaseVersion, to, cancellationToken);
     }
 
-    private void MigrateUp(IMongoDatabase db, in DocumentVersion currentVersion, in DocumentVersion toVersion)
+    private async Task MigrateUpAsync(IMongoDatabase db, DocumentVersion currentVersion, DocumentVersion toVersion, CancellationToken cancellationToken)
     {
         var migrations = _migrationLocator
             .GetMigrationsFromTo(_databaseMigrationType, currentVersion, toVersion);
@@ -65,14 +66,14 @@ internal class DatabaseMigrationRunner : IDatabaseMigrationRunner
         {
             _logger.LogInformation("Database Migration Up: {Type}:{Version} ", currentVersion.GetType(), migration.Version);
 
-            migration.Up(db);
-            _databaseVersionService.Save(db, migration);
+            await migration.UpAsync(db, cancellationToken);
+            await _databaseVersionService.SaveAsync(db, migration, cancellationToken);
 
             _logger.LogInformation("Database Migration Up finished successful: {Type}:{Version} ", migration.GetType(), migration.Version);
         }
     }
 
-    private void MigrateDown(IMongoDatabase db, in DocumentVersion currentVersion, in DocumentVersion toVersion)
+    private async Task MigrateDownAsync(IMongoDatabase db, DocumentVersion currentVersion, DocumentVersion toVersion, CancellationToken cancellationToken)
     {
         var migrations = _migrationLocator
             .GetMigrationsFromToDown(_databaseMigrationType, currentVersion, toVersion);
@@ -81,8 +82,8 @@ internal class DatabaseMigrationRunner : IDatabaseMigrationRunner
         {
             _logger.LogInformation("Database Migration Down: {Type}:{Version} ", migration.GetType(), migration.Version);
 
-            migration.Down(db);
-            _databaseVersionService.Remove(db, migration);
+            await migration.DownAsync(db, cancellationToken);
+            await _databaseVersionService.RemoveAsync(db, migration, cancellationToken);
 
             _logger.LogInformation("Database Migration Down finished successful: {Type}:{Version} ", migration.GetType(), migration.Version);
         }

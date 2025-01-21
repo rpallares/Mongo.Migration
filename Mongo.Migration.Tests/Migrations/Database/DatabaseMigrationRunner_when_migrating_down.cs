@@ -25,7 +25,7 @@ internal class DatabaseMigrationRunnerWhenMigratingDown : DatabaseIntegrationTes
             });
 
         // Act
-        runner.Run(Db, DocumentVersion.Default);
+        await runner.RunAsync(Db, DocumentVersion.Default);
 
         // Assert
         var migrations = GetMigrationHistory();
@@ -48,7 +48,7 @@ internal class DatabaseMigrationRunnerWhenMigratingDown : DatabaseIntegrationTes
             });
 
         // Act
-        runner.Run(Db, new DocumentVersion(0, 0, 1));
+        await runner.RunAsync(Db, new DocumentVersion(0, 0, 1));
 
         // Assert
         List<MigrationHistory> migrations = GetMigrationHistory();

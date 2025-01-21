@@ -10,11 +10,7 @@ internal class TestDatabaseMigration002 : DatabaseMigration
     {
     }
 
-    public override void Up(IMongoDatabase db)
-    {
-    }
+    public override Task UpAsync(IMongoDatabase db, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public override void Down(IMongoDatabase db)
-    {
-    }
+    public override Task DownAsync(IMongoDatabase db, CancellationToken cancellationToken) => Task.CompletedTask;
 }

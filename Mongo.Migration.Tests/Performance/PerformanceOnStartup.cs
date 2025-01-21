@@ -46,7 +46,7 @@ public class PerformanceTestOnStartup
         
         IStartUpDocumentMigrationRunner documentMigrationRunner =
             TestcontainersContext.Provider.GetRequiredService<IStartUpDocumentMigrationRunner>();
-        documentMigrationRunner.RunAll(client.GetDatabase(DatabaseName));
+        await documentMigrationRunner.RunAllAsync(client.GetDatabase(DatabaseName), CancellationToken.None);
         swWithMigration.Stop();
 
         ClearCollection();

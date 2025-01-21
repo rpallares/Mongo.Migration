@@ -4,7 +4,7 @@ namespace Mongo.Migration.Migrations.Database;
 
 public interface IDatabaseMigration : IMigration
 {
-    void Up(IMongoDatabase db);
+    Task UpAsync(IMongoDatabase db, CancellationToken cancellationToken);
 
-    void Down(IMongoDatabase db);
+    Task DownAsync(IMongoDatabase db, CancellationToken cancellationToken);
 }

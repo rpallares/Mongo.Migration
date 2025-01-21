@@ -15,7 +15,7 @@ public abstract class DatabaseMigration : IDatabaseMigration
 
     public Type Type => typeof(DatabaseMigration);
 
-    public abstract void Up(IMongoDatabase db);
+    public abstract Task UpAsync(IMongoDatabase db, CancellationToken cancellationToken);
 
-    public abstract void Down(IMongoDatabase db);
+    public abstract Task DownAsync(IMongoDatabase db, CancellationToken cancellationToken);
 }

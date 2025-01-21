@@ -5,5 +5,5 @@ namespace Mongo.Migration.Migrations.Database;
 
 public interface IDatabaseMigrationRunner
 {
-    void Run(IMongoDatabase db, in DocumentVersion? targetVersion = null);
+    Task RunAsync(IMongoDatabase db, DocumentVersion? targetVersion = null, CancellationToken cancellationToken = default);
 }

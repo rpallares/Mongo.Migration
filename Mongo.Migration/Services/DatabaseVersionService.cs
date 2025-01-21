@@ -21,9 +21,12 @@ internal class DatabaseVersionService : IDatabaseVersionService
         return _migrationLocator.GetLatestVersion(typeof(DatabaseMigration));
     }
 
-    public DocumentVersion GetLatestDatabaseVersion(IMongoDatabase db)
+    public async Task<DocumentVersion> GetLatestDatabaseVersionAsync(IMongoDatabase db, CancellationToken cancellationToken)
     {
-        var migrations = GetMigrationsCollection(db).Find(m => true).ToList();
+        var cursor = await GetMigrationsCollection(db)
+            .FindAsync(m => true, cancellationToken: cancellationToken);
+        var migrations = await cursor.ToListAsync(cancellationToken);
+
         if (migrations is { Count: 0 })
         {
             return DocumentVersion.Default;
@@ -32,19 +35,24 @@ internal class DatabaseVersionService : IDatabaseVersionService
         return migrations.Max(m => m.Version);
     }
 
-    public void Save(IMongoDatabase db, IDatabaseMigration migration)
+    public async Task SaveAsync(IMongoDatabase db, IDatabaseMigration migration, CancellationToken cancellationToken)
     {
-        GetMigrationsCollection(db).InsertOne(
-            new()
-            {
-                MigrationId = migration.GetType().ToString(),
-                Version = migration.Version
-            });
+        await GetMigrationsCollection(db)
+            .InsertOneAsync(
+                new()
+                {
+                    MigrationId = migration.GetType().ToString(),
+                    Version = migration.Version
+                },
+                cancellationToken: cancellationToken);
     }
 
-    public void Remove(IMongoDatabase db, IDatabaseMigration migration)
+    public async Task RemoveAsync(IMongoDatabase db, IDatabaseMigration migration, CancellationToken cancellationToken)
     {
-        GetMigrationsCollection(db).DeleteOne(Builders<MigrationHistory>.Filter.Eq(mh => mh.MigrationId, migration.GetType().ToString()));
+        await GetMigrationsCollection(db)
+            .DeleteOneAsync(
+                Builders<MigrationHistory>.Filter.Eq(mh => mh.MigrationId, migration.GetType().ToString()),
+                cancellationToken: cancellationToken);
     }
 
     private static IMongoCollection<MigrationHistory> GetMigrationsCollection(IMongoDatabase db)

@@ -42,20 +42,20 @@ internal class MigrationService : IMigrationService
         }
     }
 
-    public async Task MigrateAsync(string databaseName, string? targetDatabaseVersion)
+    public async Task MigrateAsync(string databaseName, string? targetDatabaseVersion, CancellationToken cancellationToken)
     {
         if (_startupSettings.DatabaseMigrationEnabled)
         {
-            await ExecuteDatabaseMigrationAsync(databaseName, targetDatabaseVersion);
+            await ExecuteDatabaseMigrationAsync(databaseName, targetDatabaseVersion, cancellationToken);
         }
 
         if (_startupSettings.StartupDocumentMigrationEnabled)
         {
-            await ExecuteDocumentMigrationAsync(databaseName);
+            await ExecuteDocumentMigrationAsync(databaseName, cancellationToken);
         }
     }
 
-    private async Task ExecuteDatabaseMigrationAsync(string databaseName, string? targetVersion)
+    private async Task ExecuteDatabaseMigrationAsync(string databaseName, string? targetVersion, CancellationToken cancellationToken)
     {
         Stopwatch sw = Stopwatch.StartNew();
 
@@ -71,12 +71,12 @@ internal class MigrationService : IMigrationService
 
         IMongoDatabase database = _client.GetDatabase(databaseName);
         IDatabaseMigrationRunner runner = scope.ServiceProvider.GetRequiredService<IDatabaseMigrationRunner>();
-        runner.Run(database, typedTargetVersion);
+        await runner.RunAsync(database, typedTargetVersion, cancellationToken);
 
         _logger.LogInformation("Database migration done in {ElapsedMs} ms", sw.ElapsedMilliseconds);
     }
 
-    private async Task ExecuteDocumentMigrationAsync(string databaseName)
+    private async Task ExecuteDocumentMigrationAsync(string databaseName, CancellationToken cancellationToken)
     {
         Stopwatch sw = Stopwatch.StartNew();
         _logger.LogInformation("Executing document migration...");
@@ -84,7 +84,7 @@ internal class MigrationService : IMigrationService
 
         IMongoDatabase database = _client.GetDatabase(databaseName);
         IStartUpDocumentMigrationRunner runner = scope.ServiceProvider.GetRequiredService<IStartUpDocumentMigrationRunner>();
-        runner.RunAll(database);
+        await runner.RunAllAsync(database, cancellationToken);
 
         _logger.LogInformation("Database migration done in {ElapsedMs} ms", sw.ElapsedMilliseconds);
     }

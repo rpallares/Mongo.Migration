@@ -4,5 +4,5 @@ public interface IMigrationService
 {
     void RegisterBsonStatics();
 
-    Task MigrateAsync(string databaseName, string? targetDatabaseVersion);
+    Task MigrateAsync(string databaseName, string? targetDatabaseVersion, CancellationToken cancellationToken);
 }

@@ -17,7 +17,7 @@ internal class DatabaseMigrationRunnerWhenMigratingUp : DatabaseIntegrationTest
         IDatabaseMigrationRunner runner = TestcontainersContext.Provider.GetRequiredService<IDatabaseMigrationRunner>();
 
         // Act
-        runner.Run(Db, DocumentVersion.Empty);
+        await runner.RunAsync(Db, DocumentVersion.Empty);
 
         // Assert
         var migrations = GetMigrationHistory();
@@ -36,7 +36,7 @@ internal class DatabaseMigrationRunnerWhenMigratingUp : DatabaseIntegrationTest
         InsertMigrations(new DatabaseMigration[] { new TestDatabaseMigration001(), new TestDatabaseMigration002() });
 
         // Act
-        runner.Run(Db, DocumentVersion.Empty);
+        await runner.RunAsync(Db, DocumentVersion.Empty);
 
         // Assert
         var migrations = GetMigrationHistory();
@@ -53,7 +53,7 @@ internal class DatabaseMigrationRunnerWhenMigratingUp : DatabaseIntegrationTest
         InsertMigrations(new DatabaseMigration[] { new TestDatabaseMigration001(), new TestDatabaseMigration002(), new TestDatabaseMigration003() });
 
         // Act
-        runner.Run(Db, DocumentVersion.Empty);
+        await runner.RunAsync(Db, DocumentVersion.Empty, CancellationToken.None);
 
         // Assert
         var migrations = GetMigrationHistory();

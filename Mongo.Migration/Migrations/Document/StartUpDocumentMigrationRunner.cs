@@ -23,7 +23,7 @@ internal class StartUpDocumentMigrationRunner : IStartUpDocumentMigrationRunner
         _migrationRunner = migrationRunner;
     }
 
-    public void RunAll(IMongoDatabase database)
+    public async Task RunAllAsync(IMongoDatabase database, CancellationToken cancellationToken)
     {
         var locations = _collectionLocator.GetLocatesOrEmpty();
 
@@ -39,9 +39,9 @@ internal class StartUpDocumentMigrationRunner : IStartUpDocumentMigrationRunner
 
             var query = CreateQueryForRelevantDocuments(type);
 
-            using (var cursor = collection.FindSync(query))
+            using (var cursor = await collection.FindAsync(query, cancellationToken: cancellationToken))
             {
-                while (cursor.MoveNext())
+                while (await cursor.MoveNextAsync(cancellationToken))
                 {
                     var batch = cursor.Current;
                     foreach (var document in batch)
@@ -60,7 +60,7 @@ internal class StartUpDocumentMigrationRunner : IStartUpDocumentMigrationRunner
 
             if (bulk.Count > 0)
             {
-                collection.BulkWrite(bulk);
+                await collection.BulkWriteAsync(bulk, cancellationToken: cancellationToken);
             }
         }
     }

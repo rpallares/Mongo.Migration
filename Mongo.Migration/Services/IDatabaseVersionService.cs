@@ -9,9 +9,9 @@ public interface IDatabaseVersionService
 {
     DocumentVersion GetLatestMigrationVersion();
 
-    DocumentVersion GetLatestDatabaseVersion(IMongoDatabase db);
+    Task<DocumentVersion> GetLatestDatabaseVersionAsync(IMongoDatabase db, CancellationToken cancellationToken);
 
-    void Save(IMongoDatabase db, IDatabaseMigration migration);
+    Task SaveAsync(IMongoDatabase db, IDatabaseMigration migration, CancellationToken cancellationToken);
 
-    void Remove(IMongoDatabase db, IDatabaseMigration migration);
+    Task RemoveAsync(IMongoDatabase db, IDatabaseMigration migration, CancellationToken cancellationToken);
 }
