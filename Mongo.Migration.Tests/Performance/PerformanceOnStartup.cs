@@ -88,7 +88,7 @@ public class PerformanceTestOnStartup
             return;
         }
         var collection = client.GetDatabase(DatabaseName)
-            .GetCollection<TestClass>(CollectionName);
+            .GetCollection<TestClassNoMigration>(CollectionName);
         var result = await (await collection.FindAsync(_ => true)).ToListAsync();
     }
 

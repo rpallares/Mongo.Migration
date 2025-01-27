@@ -1,11 +1,11 @@
 ﻿namespace Mongo.Migration.Documents.Attributes;
 
 [AttributeUsage(AttributeTargets.Class)]
-public class RuntimeVersion : Attribute
+public class RuntimeVersionAttribute : Attribute
 {
     public DocumentVersion Version { get; }
 
-    public RuntimeVersion(string version)
+    public RuntimeVersionAttribute(string version)
     {
         Version = DocumentVersion.Parse(version.AsSpan());
     }

@@ -1,37 +1,35 @@
-﻿using Mongo.Migration.Documents.Attributes;
+﻿using System.Collections.Frozen;
+using Mongo.Migration.Documents.Attributes;
 
 namespace Mongo.Migration.Documents.Locators;
 
 internal class RuntimeVersionLocator : AbstractLocator<DocumentVersion, Type>, IRuntimeVersionLocator
 {
+    private readonly FrozenDictionary<Type, DocumentVersion> _codeDefinedDictionary;
+
+    internal RuntimeVersionLocator(IEnumerable<KeyValuePair<Type, DocumentVersion>> alreadyDefinedRuntimeVersions)
+    {
+        _codeDefinedDictionary = alreadyDefinedRuntimeVersions.ToFrozenDictionary();
+    }
+
     public override DocumentVersion? GetLocateOrNull(Type identifier)
     {
-        if (!LocatesDictionary.ContainsKey(identifier))
+        if (_codeDefinedDictionary.TryGetValue(identifier, out DocumentVersion version))
         {
-            return null;
+            return version;
         }
 
-        LocatesDictionary.TryGetValue(identifier, out var value);
-        return value;
+        if (LocatesDictionary.TryGetValue(identifier, out version))
+        {
+            return version;
+        }
+
+        return null;
     }
 
     public override void Locate()
     {
-        var types =
-            from a in AppDomain.CurrentDomain.GetAssemblies()
-            from t in a.GetTypes()
-            let attributes = t.GetCustomAttributes(typeof(RuntimeVersion), true)
-            where attributes is {Length: > 0}
-            select new { Type = t, Attributes = attributes.Cast<RuntimeVersion>() };
-
-        var versions = new Dictionary<Type, DocumentVersion>();
-
-        foreach (var type in types)
-        {
-            var version = type.Attributes.First().Version;
-            versions.Add(type.Type, version);
-        }
-
-        LocatesDictionary = versions;
+        LocatesDictionary = LocateAttributes<RuntimeVersionAttribute>()
+            .ToFrozenDictionary(pair => pair.Item1, pair => pair.Item2.Version);
     }
 }

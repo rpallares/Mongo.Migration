@@ -28,9 +28,22 @@ internal class MigrationInterceptorProviderWhenGetSerializer : IntegrationTest
         var serializationProvider = TestcontainersContext.Provider.GetRequiredService<MigrationBsonSerializerProvider>();
 
         // Act
-        var serializer = serializationProvider.GetSerializer(typeof(TestClass));
+        var serializer = serializationProvider.GetSerializer(typeof(TestClassNoMigration));
 
         // Assert
         Assert.That(serializer, Is.Null);
+    }
+
+    [Test]
+    public void When_entity_is_not_document_but_manually_added_Then_provide_serializer()
+    {
+        // Arrange 
+        var serializationProvider = TestcontainersContext.Provider.GetRequiredService<MigrationBsonSerializerProvider>();
+
+        // Act
+        var serializer = serializationProvider.GetSerializer(typeof(TestClassWithTwoMigrationMiddleVersion));
+
+        // Assert
+        Assert.That(serializer.ValueType, Is.EqualTo(typeof(TestClassWithTwoMigrationMiddleVersion)));
     }
 }

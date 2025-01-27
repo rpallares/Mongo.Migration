@@ -3,7 +3,7 @@ using MongoDB.Bson;
 
 namespace Mongo.Migration.Tests.TestDoubles;
 
-internal class TestDocumentWithTwoMigrationHighestVersion001 : DocumentMigration<TestDocumentWithTwoMigrationHighestVersion>
+public class TestDocumentWithTwoMigrationHighestVersion001 : DocumentMigration<TestDocumentWithTwoMigrationHighestVersion>
 {
     public TestDocumentWithTwoMigrationHighestVersion001()
         : base("0.0.1")

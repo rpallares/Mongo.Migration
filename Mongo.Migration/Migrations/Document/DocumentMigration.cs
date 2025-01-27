@@ -4,7 +4,6 @@ using MongoDB.Bson;
 namespace Mongo.Migration.Migrations.Document;
 
 public abstract class DocumentMigration<TClass> : IDocumentMigration
-    where TClass : IDocument
 {
     protected DocumentMigration(string version)
     {

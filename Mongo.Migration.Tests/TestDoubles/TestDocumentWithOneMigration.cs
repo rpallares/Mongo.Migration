@@ -5,13 +5,13 @@ using MongoDB.Bson;
 namespace Mongo.Migration.Tests.TestDoubles;
 
 [RuntimeVersion("0.0.1")]
-internal class TestDocumentWithOneMigration : Document
+public class TestDocumentWithOneMigration : Document
 {
     public ObjectId Id { get; set; }
     public int Doors { get; set; }
 }
 
-internal class TestDocumentWithoutAttribute : Document
+public class TestDocumentWithoutAttribute : Document
 {
     public ObjectId Id { get; set; }
     public int Doors { get; set; }

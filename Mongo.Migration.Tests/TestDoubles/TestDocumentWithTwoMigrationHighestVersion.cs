@@ -6,7 +6,7 @@ namespace Mongo.Migration.Tests.TestDoubles;
 
 [RuntimeVersion("0.0.2")]
 [CollectionLocation("Test")]
-internal class TestDocumentWithTwoMigrationHighestVersion : Document
+public class TestDocumentWithTwoMigrationHighestVersion : Document
 {
     public ObjectId Id { get; set; }
 

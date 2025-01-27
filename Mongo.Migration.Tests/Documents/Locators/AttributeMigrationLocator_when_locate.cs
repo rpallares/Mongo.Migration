@@ -11,7 +11,7 @@ internal class VersionLocatorWhenLocate
     public void Then_find_current_version_of_document()
     {
         // Arrange
-        var locator = new RuntimeVersionLocator();
+        var locator = new RuntimeVersionLocator([]);
 
         // Act
         var currentVersion = locator.GetLocateOrNull(typeof(TestDocumentWithOneMigration));
@@ -24,7 +24,7 @@ internal class VersionLocatorWhenLocate
     public void When_document_has_no_attribute_Then_return_null()
     {
         // Arrange
-        var locator = new RuntimeVersionLocator();
+        var locator = new RuntimeVersionLocator([]);
 
         // Act
         var currentVersion = locator.GetLocateOrNull(typeof(TestDocumentWithoutAttribute));

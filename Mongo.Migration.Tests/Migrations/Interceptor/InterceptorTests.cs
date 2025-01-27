@@ -42,17 +42,21 @@ public class InterceptorMigrationWhenCreating : IntegrationTest
         {
             new BsonDocument
             {
-                new("Doors0", new BsonInt32(0)),
+                new("Doors0", new BsonInt32(0))
+            },
+            new BsonDocument
+            {
+                new("Doors0", new BsonInt32(1)),
                 new("Version", new BsonString("0.0.0"))
             },
             new BsonDocument
             {
-                new("Doors1", new BsonInt32(1)),
+                new("Doors1", new BsonInt32(2)),
                 new("Version", new BsonString("0.0.1"))
             },
             new BsonDocument
             {
-                new("Doors2", new BsonInt32(2)),
+                new("Doors2", new BsonInt32(3)),
                 new("Version", new BsonString("0.0.2"))
             }
         });
@@ -63,7 +67,7 @@ public class InterceptorMigrationWhenCreating : IntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.That(documents, Has.Count.EqualTo(3));
+            Assert.That(documents, Has.Count.EqualTo(4));
             Assert.That(
                 documents.Select(d => d.Version.ToString()),
                 Is.All.EqualTo("0.0.1"));
@@ -71,8 +75,78 @@ public class InterceptorMigrationWhenCreating : IntegrationTest
             Assert.That(documents[0].Doors1, Is.EqualTo(0));
             Assert.That(documents[1].Doors1, Is.EqualTo(1));
             Assert.That(documents[2].Doors1, Is.EqualTo(2));
+            Assert.That(documents[3].Doors1, Is.EqualTo(3));
         });
     }
+
+    [Test]
+    public async Task TestSerializationVersionAsStringIntercepted()
+    {
+        IMongoCollection<BsonDocument> untypedCollection = GetCollection<BsonDocument>();
+        IMongoCollection<TestClassWithTwoMigrationMiddleVersion> testDocumentCollection =
+            GetCollection<TestClassWithTwoMigrationMiddleVersion>();
+
+        await testDocumentCollection.InsertOneAsync(new TestClassWithTwoMigrationMiddleVersion
+        {
+            Doors1 = 42
+        });
+
+        BsonDocument? documentInserted = await untypedCollection
+            .Find(Builders<BsonDocument>.Filter.Eq("Doors1", 42))
+            .FirstOrDefaultAsync();
+
+        Assert.That(documentInserted, Is.Not.Null);
+        Assert.That(documentInserted["Version"].AsString, Is.EqualTo("0.0.1"));
+    }
+
+    [Test]
+    public async Task TestDeserializationVersionAsStringIntercepted()
+    {
+        IMongoCollection<BsonDocument> untypedCollection = GetCollection<BsonDocument>();
+        IMongoCollection<TestClassWithTwoMigrationMiddleVersion> testDocumentCollection =
+            GetCollection<TestClassWithTwoMigrationMiddleVersion>();
+
+        await untypedCollection.InsertManyAsync(new[]
+        {
+            new BsonDocument
+            {
+                new("Doors0", new BsonInt32(0))
+            },
+            new BsonDocument
+            {
+                new("Doors0", new BsonInt32(1)),
+                new("Version", new BsonString("0.0.0"))
+            },
+            new BsonDocument
+            {
+                new("Doors1", new BsonInt32(2)),
+                new("Version", new BsonString("0.0.1"))
+            },
+            new BsonDocument
+            {
+                new("Doors2", new BsonInt32(3)),
+                new("Version", new BsonString("0.0.2"))
+            }
+        });
+
+        var asyncCursor = await testDocumentCollection
+            .FindAsync(FilterDefinition<TestClassWithTwoMigrationMiddleVersion>.Empty);
+        List<TestClassWithTwoMigrationMiddleVersion> documents = await asyncCursor.ToListAsync();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(documents, Has.Count.EqualTo(4));
+            Assert.That(
+                documents.Select(d => d.Version.ToString()),
+                Is.All.EqualTo("0.0.1"));
+
+            Assert.That(documents[0].Doors1, Is.EqualTo(0));
+            Assert.That(documents[1].Doors1, Is.EqualTo(1));
+            Assert.That(documents[2].Doors1, Is.EqualTo(2));
+            Assert.That(documents[3].Doors1, Is.EqualTo(3));
+        });
+    }
+
 
     [SetUp]
     public void SetUpLocal()

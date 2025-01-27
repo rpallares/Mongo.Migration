@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Mongo.Migration.Services;
 using Mongo.Migration.Startup;
+using Mongo.Migration.Tests.TestDoubles;
 using MongoDB.Driver;
 using NUnit.Framework;
 using Testcontainers.MongoDb;
@@ -30,7 +31,15 @@ public sealed class TestcontainersContext
         services
             .AddLogging(builder => builder.AddProvider(NullLoggerProvider.Instance))
             .AddSingleton<IMongoClient>(new MongoClient(s_mongoDbContainer.GetConnectionString()))
-            .AddMigration();
+            .AddMigration(builder =>
+            {
+                builder
+                    .AddDocumentMigratedType<TestClassWithTwoMigrationMiddleVersion>("0.0.1");
+
+                builder.AddRuntimeDocumentMigration()
+                    .AddStartupDocumentMigration()
+                    .AddDatabaseMigration();
+            });
 
         s_provider = services.BuildServiceProvider();
 

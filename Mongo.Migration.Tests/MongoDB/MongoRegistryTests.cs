@@ -29,7 +29,7 @@ internal class MongoRegistryTests : IntegrationTest
     {
         Assert.That(
             BsonSerializer.SerializerRegistry.GetSerializer<TestDocumentWithOneMigration>(),
-            Is.TypeOf<MigrationSerializer<TestDocumentWithOneMigration>>());
+            Is.TypeOf<MigrationDocumentSerializer<TestDocumentWithOneMigration>>());
     }
 
     [Test]

@@ -5,7 +5,7 @@ using MongoDB.Bson;
 namespace Mongo.Migration.Tests.TestDoubles;
 
 [RuntimeVersion("0.0.1")]
-internal class TestDocumentWithTwoMigrationMiddleVersion : Document
+public class TestDocumentWithTwoMigrationMiddleVersion : Document
 {
     public ObjectId Id { get; set; }
     public int Doors1 { get; set; }

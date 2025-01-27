@@ -49,9 +49,9 @@ public class PerformanceRuntimeMigration
             { "Version", BsonString.Create("0.0.0") }
         });
 
-        IMongoCollection<TestClass> collection = GetCollection<TestClass>();
+        IMongoCollection<TestClassNoMigration> collection = GetCollection<TestClassNoMigration>();
         Stopwatch sw = Stopwatch.StartNew();
-        List<TestClass> results = await (await collection.FindAsync(FilterDefinition<TestClass>.Empty)).ToListAsync();
+        List<TestClassNoMigration> results = await (await collection.FindAsync(FilterDefinition<TestClassNoMigration>.Empty)).ToListAsync();
         sw.Stop();
 
         await TestContext.Out.WriteLineAsync($"Elapsed {sw.ElapsedMilliseconds} ms to read {results.Count} documents");

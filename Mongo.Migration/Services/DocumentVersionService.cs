@@ -12,6 +12,7 @@ namespace Mongo.Migration.Services;
 internal sealed class DocumentVersionService : IDocumentVersionService
 {
     private const string DefaultVersionFieldName = "Version";
+    
 
     private readonly IMigrationLocator<IDocumentMigration> _migrationLocator;
 
@@ -73,7 +74,7 @@ internal sealed class DocumentVersionService : IDocumentVersionService
         var type = typeof(TClass);
         var documentVersion = instance.Version;
         var latestVersion = _migrationLocator.GetLatestVersion(type);
-        var currentVersion = _runtimeVersionLocator.GetLocateOrNull(type) ?? latestVersion;
+        var currentVersion = GetCurrentVersion(type) ?? latestVersion;
 
         if (documentVersion == currentVersion)
         {

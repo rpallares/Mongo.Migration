@@ -2,7 +2,7 @@
 
 namespace Mongo.Migration.Tests.TestDoubles;
 
-public class TestClass
+public class TestClassNoMigration
 {
     public ObjectId Id { get; set; }
 

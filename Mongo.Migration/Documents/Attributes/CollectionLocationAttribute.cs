@@ -1,11 +1,11 @@
 namespace Mongo.Migration.Documents.Attributes;
 
 [AttributeUsage(AttributeTargets.Class)]
-public class CollectionLocation : Attribute
+public class CollectionLocationAttribute : Attribute
 {
     public CollectionLocationInformation CollectionInformation { get; }
 
-    public CollectionLocation(string collectionName)
+    public CollectionLocationAttribute(string collectionName)
     {
         CollectionInformation = new CollectionLocationInformation(collectionName);
     }
