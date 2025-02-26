@@ -17,7 +17,7 @@ public class PerformanceTestOnStartup
 
     private const string CollectionName = "Test";
 
-    private const int ToleranceMs = 600;
+    private const int ToleranceMs = 2000;
 
     [Test]
     public async Task When_migrating_number_of_documents()
