@@ -10,7 +10,7 @@ public class DocumentWhenCreating
     public void Then_document_can_be_created()
     {
         // Arrange Act
-        IDocument document = new Document();
+        Document document = new();
 
         // Assert
         Assert.That(document, Is.TypeOf<Document>());
@@ -20,7 +20,7 @@ public class DocumentWhenCreating
     public void Then_document_has_a_version()
     {
         // Arrange 
-        IDocument document = new Document();
+        Document document = new();
 
         // Act
         var version = document.Version;

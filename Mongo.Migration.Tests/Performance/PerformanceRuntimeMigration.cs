@@ -20,14 +20,14 @@ public class PerformanceRuntimeMigration
             .DeleteManyAsync(FilterDefinition<BsonDocument>.Empty);
     }
 
-    private IMongoCollection<T> GetCollection<T>()
+    private static IMongoCollection<T> GetCollection<T>()
     {
         return TestcontainersContext.MongoClient
             .GetDatabase(DatabaseName)
             .GetCollection<T>(CollectionName);
     }
 
-    private Task InsertDocumentsAsync(int documentCount, Func<int, BsonDocument> documentFactory)
+    private static Task InsertDocumentsAsync(int documentCount, Func<int, BsonDocument> documentFactory)
     {
         var documents = Enumerable
             .Range(0, documentCount)
@@ -71,7 +71,7 @@ public class PerformanceRuntimeMigration
         });
 
         IMongoCollection<TestDocumentWithTwoMigrationHighestVersion> collection = GetCollection<TestDocumentWithTwoMigrationHighestVersion>();
-        TestDocumentWithTwoMigrationHighestVersion? initDocument = collection.AsQueryable().FirstOrDefault();
+        TestDocumentWithTwoMigrationHighestVersion? _ = collection.AsQueryable().FirstOrDefault();
         
         Stopwatch sw = Stopwatch.StartNew();
         List<TestDocumentWithTwoMigrationHighestVersion> results = await (await collection.FindAsync(FilterDefinition<TestDocumentWithTwoMigrationHighestVersion>.Empty)).ToListAsync();
@@ -94,7 +94,7 @@ public class PerformanceRuntimeMigration
         });
 
         IMongoCollection<TestDocumentWithTwoMigrationHighestVersion> collection = GetCollection<TestDocumentWithTwoMigrationHighestVersion>();
-        TestDocumentWithTwoMigrationHighestVersion? initDocument = collection.AsQueryable().FirstOrDefault();
+        TestDocumentWithTwoMigrationHighestVersion? _ = collection.AsQueryable().FirstOrDefault();
 
         Stopwatch sw = Stopwatch.StartNew();
         List<TestDocumentWithTwoMigrationHighestVersion> results = await (await collection.FindAsync(FilterDefinition<TestDocumentWithTwoMigrationHighestVersion>.Empty)).ToListAsync();

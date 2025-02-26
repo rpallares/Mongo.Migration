@@ -13,7 +13,9 @@ namespace Mongo.Migration.Tests;
 [SetUpFixture]
 public sealed class TestcontainersContext
 {
-    private static readonly MongoDbContainer s_mongoDbContainer = new MongoDbBuilder().Build();
+    private static readonly Lazy<MongoDbContainer> s_lazyMongoDbContainer = new(() =>
+        new MongoDbBuilder().Build()
+        );
 
     private static ServiceProvider? s_provider;
 
@@ -25,18 +27,18 @@ public sealed class TestcontainersContext
     [OneTimeSetUp]
     public async Task OneTimeSetup()
     {
-        await s_mongoDbContainer.StartAsync();
+        await s_lazyMongoDbContainer.Value.StartAsync();
 
         IServiceCollection services = new ServiceCollection();
         services
             .AddLogging(builder => builder.AddProvider(NullLoggerProvider.Instance))
-            .AddSingleton<IMongoClient>(new MongoClient(s_mongoDbContainer.GetConnectionString()))
-            .AddMigration(builder =>
+            .AddSingleton<IMongoClient>(new MongoClient(s_lazyMongoDbContainer.Value.GetConnectionString()))
+            .AddMigration(cfg =>
             {
-                builder
+                cfg
                     .AddDocumentMigratedType<TestClassWithTwoMigrationMiddleVersion>("0.0.1");
 
-                builder.AddRuntimeDocumentMigration()
+                cfg.AddRuntimeDocumentMigration()
                     .AddStartupDocumentMigration()
                     .AddDatabaseMigration();
             });
@@ -55,7 +57,7 @@ public sealed class TestcontainersContext
             await s_provider.DisposeAsync();
         }
         
-        await s_mongoDbContainer.StopAsync();
-        await s_mongoDbContainer.DisposeAsync();
+        await s_lazyMongoDbContainer.Value.StopAsync();
+        await s_lazyMongoDbContainer.Value.DisposeAsync();
     }
 }

@@ -1,12 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0</TargetFrameworks>
+		<TargetFrameworks>net7.0;net8.0;net9.0</TargetFrameworks>
+		<LangVersion>13.0</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<PackageIcon>op-icon.png</PackageIcon>
+		<DebugSymbols>true</DebugSymbols>
 		<DebugType>embedded</DebugType>
-		<NeutralLanguage>en</NeutralLanguage>
+		<Deterministic>true</Deterministic>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Version>5.0.0</Version>
 	</PropertyGroup>
 
 	<ItemGroup>

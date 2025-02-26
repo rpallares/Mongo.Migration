@@ -21,10 +21,14 @@ internal class DatabaseMigrationRunnerWhenMigratingUp : DatabaseIntegrationTest
 
         // Assert
         var migrations = GetMigrationHistory();
-        Assert.That(migrations, Is.Not.Empty);
-        Assert.That(migrations[0].Version.ToString(), Is.EqualTo("0.0.1"));
-        Assert.That(migrations[1].Version.ToString(), Is.EqualTo("0.0.2"));
-        Assert.That(migrations[2].Version.ToString(), Is.EqualTo("0.0.3"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(migrations, Is.Not.Empty);
+            Assert.That(migrations[0].Version.ToString(), Is.EqualTo("0.0.1"));
+            Assert.That(migrations[1].Version.ToString(), Is.EqualTo("0.0.2"));
+            Assert.That(migrations[2].Version.ToString(), Is.EqualTo("0.0.3"));
+        });
     }
 
     [Test]
@@ -33,15 +37,19 @@ internal class DatabaseMigrationRunnerWhenMigratingUp : DatabaseIntegrationTest
         // Arrange
         await OnSetUpAsync();
         IDatabaseMigrationRunner runner = TestcontainersContext.Provider.GetRequiredService<IDatabaseMigrationRunner>();
-        InsertMigrations(new DatabaseMigration[] { new TestDatabaseMigration001(), new TestDatabaseMigration002() });
+        InsertMigrations([new TestDatabaseMigration001(), new TestDatabaseMigration002()]);
 
         // Act
         await runner.RunAsync(Db, DocumentVersion.Empty);
 
         // Assert
         var migrations = GetMigrationHistory();
-        Assert.That(migrations, Is.Not.Empty);
-        Assert.That(migrations[2].Version.ToString(), Is.EqualTo("0.0.3"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(migrations, Is.Not.Empty);
+            Assert.That(migrations[2].Version.ToString(), Is.EqualTo("0.0.3"));
+        });
     }
 
     [Test]
@@ -50,7 +58,12 @@ internal class DatabaseMigrationRunnerWhenMigratingUp : DatabaseIntegrationTest
         // Arrange
         await OnSetUpAsync();
         IDatabaseMigrationRunner runner = TestcontainersContext.Provider.GetRequiredService<IDatabaseMigrationRunner>();
-        InsertMigrations(new DatabaseMigration[] { new TestDatabaseMigration001(), new TestDatabaseMigration002(), new TestDatabaseMigration003() });
+        InsertMigrations(
+        [
+            new TestDatabaseMigration001(),
+            new TestDatabaseMigration002(),
+            new TestDatabaseMigration003()
+        ]);
 
         // Act
         await runner.RunAsync(Db, DocumentVersion.Empty, CancellationToken.None);
@@ -58,10 +71,12 @@ internal class DatabaseMigrationRunnerWhenMigratingUp : DatabaseIntegrationTest
         // Assert
         var migrations = GetMigrationHistory();
 
-
-        Assert.That(migrations, Is.Not.Empty);
-        Assert.That(migrations[0].Version.ToString(), Is.EqualTo("0.0.1"));
-        Assert.That(migrations[1].Version.ToString(), Is.EqualTo("0.0.2"));
-        Assert.That(migrations[2].Version.ToString(), Is.EqualTo("0.0.3"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(migrations, Is.Not.Empty);
+            Assert.That(migrations[0].Version.ToString(), Is.EqualTo("0.0.1"));
+            Assert.That(migrations[1].Version.ToString(), Is.EqualTo("0.0.2"));
+            Assert.That(migrations[2].Version.ToString(), Is.EqualTo("0.0.3"));
+        });
     }
 }

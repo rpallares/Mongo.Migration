@@ -31,6 +31,7 @@ internal class MigrationService : IMigrationService
         _provider = provider;
     }
 
+    /// <inheritdoc/>
     public void RegisterBsonStatics()
     {
         BsonSerializer.RegisterSerializer(new DocumentVersionSerializer());
@@ -42,7 +43,8 @@ internal class MigrationService : IMigrationService
         }
     }
 
-    public async Task MigrateAsync(string databaseName, string? targetDatabaseVersion, CancellationToken cancellationToken)
+    /// <inheritdoc/>
+    public async Task ExecuteMigrationsAsync(string databaseName, string? targetDatabaseVersion, CancellationToken cancellationToken)
     {
         if (_startupSettings.DatabaseMigrationEnabled)
         {
@@ -55,7 +57,8 @@ internal class MigrationService : IMigrationService
         }
     }
 
-    private async Task ExecuteDatabaseMigrationAsync(string databaseName, string? targetVersion, CancellationToken cancellationToken)
+    /// <inheritdoc/>
+    public async Task ExecuteDatabaseMigrationAsync(string databaseName, string? targetVersion, CancellationToken cancellationToken)
     {
         Stopwatch sw = Stopwatch.StartNew();
 
@@ -76,7 +79,8 @@ internal class MigrationService : IMigrationService
         _logger.LogInformation("Database migration done in {ElapsedMs} ms", sw.ElapsedMilliseconds);
     }
 
-    private async Task ExecuteDocumentMigrationAsync(string databaseName, CancellationToken cancellationToken)
+    /// <inheritdoc/>
+    public async Task ExecuteDocumentMigrationAsync(string databaseName, CancellationToken cancellationToken)
     {
         Stopwatch sw = Stopwatch.StartNew();
         _logger.LogInformation("Executing document migration...");

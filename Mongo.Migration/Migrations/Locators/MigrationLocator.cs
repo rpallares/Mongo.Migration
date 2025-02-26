@@ -48,7 +48,7 @@ public abstract class MigrationLocator<TMigrationType> : IMigrationLocator<TMigr
             return migrations;
         }
 
-        return Array.Empty<TMigrationType>();
+        return [];
     }
 
     public IEnumerable<TMigrationType> GetMigrationsFromTo(Type type, DocumentVersion version, DocumentVersion otherVersion)

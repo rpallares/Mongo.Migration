@@ -11,13 +11,13 @@ namespace Mongo.Migration.Tests.Performance;
 [TestFixture]
 public class PerformanceTestOnStartup
 {
-    private const int DocumentCount = 10000;
+    private const int DocumentCount = 5000;
 
     private const string DatabaseName = "PerformanceTest";
 
     private const string CollectionName = "Test";
 
-    private const int ToleranceMs = 2800;
+    private const int ToleranceMs = 600;
 
     [Test]
     public async Task When_migrating_number_of_documents()
@@ -33,7 +33,7 @@ public class PerformanceTestOnStartup
         await InsertDocumentsAsync(DocumentCount);
         var sw = new Stopwatch();
         sw.Start();
-        await QueryAllAsync(false);
+        var _ = await QueryAllAsync(false);
         sw.Stop();
 
         ClearCollection();
@@ -76,7 +76,7 @@ public class PerformanceTestOnStartup
             .InsertManyAsync(documents);
     }
 
-    private static async Task QueryAllAsync(bool withVersion)
+    private static async Task<List<object>> QueryAllAsync(bool withVersion)
     {
         IMongoClient client = TestcontainersContext.MongoClient;
 
@@ -85,11 +85,13 @@ public class PerformanceTestOnStartup
             var versionedCollection = client.GetDatabase(DatabaseName)
                 .GetCollection<TestDocumentWithTwoMigrationHighestVersion>(CollectionName);
             var versionedResult = await (await versionedCollection.FindAsync(_ => true)).ToListAsync();
-            return;
+            return versionedResult.Cast<object>().ToList();
         }
+
         var collection = client.GetDatabase(DatabaseName)
             .GetCollection<TestClassNoMigration>(CollectionName);
         var result = await (await collection.FindAsync(_ => true)).ToListAsync();
+        return result.Cast<object>().ToList();
     }
 
     private static async Task AddDocumentsToCacheAsync()

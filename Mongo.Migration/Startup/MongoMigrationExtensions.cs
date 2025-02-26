@@ -13,7 +13,7 @@ public static class MongoMigrationExtensions
         this IServiceCollection services,
         Action<MongoMigrationConfigurator>? configure = null)
     {
-        MongoMigrationConfigurator configurator = new MongoMigrationConfigurator();
+        MongoMigrationConfigurator configurator = new();
 
         configure?.Invoke(configurator);
 
@@ -67,15 +67,5 @@ public static class MongoMigrationExtensions
                 .AddTransient<IDatabaseVersionService, DatabaseVersionService>()
                 .AddTransient<IDatabaseMigrationRunner, DatabaseMigrationRunner>();
         }
-    }
-
-    public static async Task InitializeAndMigrateAsync(this IMigrationService migrationService,
-        string databaseName,
-        string? targetDatabaseVersion,
-        CancellationToken cancellationToken)
-    {
-        migrationService.RegisterBsonStatics();
-
-        await migrationService.MigrateAsync(databaseName, targetDatabaseVersion, cancellationToken);
     }
 }

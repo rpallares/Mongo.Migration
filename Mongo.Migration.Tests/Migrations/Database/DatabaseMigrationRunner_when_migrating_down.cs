@@ -17,12 +17,11 @@ internal class DatabaseMigrationRunnerWhenMigratingDown : DatabaseIntegrationTes
 
         // Arrange
         InsertMigrations(
-            new DatabaseMigration[]
-            {
-                new TestDatabaseMigration001(),
-                new TestDatabaseMigration002(),
-                new TestDatabaseMigration003()
-            });
+        [
+            new TestDatabaseMigration001(),
+            new TestDatabaseMigration002(),
+            new TestDatabaseMigration003()
+        ]);
 
         // Act
         await runner.RunAsync(Db, DocumentVersion.Default);
@@ -40,12 +39,11 @@ internal class DatabaseMigrationRunnerWhenMigratingDown : DatabaseIntegrationTes
 
         // Arrange
         InsertMigrations(
-            new DatabaseMigration[]
-            {
-                new TestDatabaseMigration001(),
-                new TestDatabaseMigration002(),
-                new TestDatabaseMigration003()
-            });
+        [
+            new TestDatabaseMigration001(),
+            new TestDatabaseMigration002(),
+            new TestDatabaseMigration003()
+        ]);
 
         // Act
         await runner.RunAsync(Db, new DocumentVersion(0, 0, 1));

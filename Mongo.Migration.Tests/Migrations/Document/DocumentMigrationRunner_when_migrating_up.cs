@@ -24,8 +24,11 @@ internal class DocumentMigrationRunnerWhenMigratingUp : IntegrationTest
         runner.Run(typeof(TestDocumentWithTwoMigrationHighestVersion), document);
 
         // Assert
-        Assert.That(document.Names.ToList()[1], Is.EqualTo("Door"));
-        Assert.That(document.Values.ToList()[0].AsString, Is.EqualTo("0.0.2"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(document.Names.ToList()[1], Is.EqualTo("Door"));
+            Assert.That(document.Values.ToList()[0].AsString, Is.EqualTo("0.0.2"));
+        });
     }
 
     [Test]
@@ -42,8 +45,11 @@ internal class DocumentMigrationRunnerWhenMigratingUp : IntegrationTest
         runner.Run(typeof(TestDocumentWithTwoMigrationHighestVersion), document);
 
         // Assert
-        Assert.That(document["Door"].AsInt32, Is.EqualTo(3));
-        Assert.That(document["Version"].AsString, Is.EqualTo("0.0.2"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(document["Door"].AsInt32, Is.EqualTo(3));
+            Assert.That(document["Version"].AsString, Is.EqualTo("0.0.2"));
+        });
     }
 
     [Test]
@@ -61,8 +67,10 @@ internal class DocumentMigrationRunnerWhenMigratingUp : IntegrationTest
         runner.Run(typeof(TestDocumentWithTwoMigrationHighestVersion), document);
 
         // Assert
-
-        Assert.That(document.Names.ToList()[1], Is.EqualTo("Door"));
-        Assert.That(document.Values.ToList()[0].AsString, Is.EqualTo("0.0.2"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(document.Names.ToList()[1], Is.EqualTo("Door"));
+            Assert.That(document.Values.ToList()[0].AsString, Is.EqualTo("0.0.2"));
+        });
     }
 }

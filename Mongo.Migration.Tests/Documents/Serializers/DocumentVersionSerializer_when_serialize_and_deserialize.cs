@@ -63,7 +63,7 @@ public class DocumentVersionSerializerWhenSerializeAndDeserialize
 
     private static BsonDocumentWriter CreateVersionWriter()
     {
-        var writer = new BsonDocumentWriter(new());
+        var writer = new BsonDocumentWriter(new BsonDocument());
         writer.WriteStartDocument();
         writer.WriteName("version");
         return writer;

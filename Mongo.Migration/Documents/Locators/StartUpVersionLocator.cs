@@ -1,4 +1,8 @@
-﻿using System.Collections.Frozen;
+﻿#if NET8_0_OR_GREATER
+using System.Collections.Frozen;
+#else
+using System.Collections.Immutable;
+#endif
 using Mongo.Migration.Documents.Attributes;
 
 namespace Mongo.Migration.Documents.Locators;
@@ -19,6 +23,10 @@ internal class StartUpVersionLocator : AbstractLocator<DocumentVersion, Type>, I
     public override void Locate()
     {
         LocatesDictionary = LocateAttributes<StartUpVersionAttribute>()
-           .ToFrozenDictionary(pair => pair.Item1, pair => pair.Item2.Version);
+#if NET8_0_OR_GREATER
+            .ToFrozenDictionary(pair => pair.Item1, pair => pair.Item2.Version);
+#else
+            .ToImmutableDictionary(pair => pair.Item1, pair => pair.Item2.Version);
+#endif
     }
 }
