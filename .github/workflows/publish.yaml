@@ -1,0 +1,35 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+(-preview[0-9]+)?"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      packages: write
+      contents: read
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+    - name: Set VERSION variable from tag
+      run: echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
+    - name: Build
+      run: dotnet build -c Release /p:Version=${VERSION}
+    - name: Test
+      run: dotnet test -c Release /p:Version=${VERSION} --no-build
+    - name: Pack
+      run: dotnet pack -c Release /p:Version=${VERSION} --no-build --output .
+    - name: Push
+      with:
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+      env:
+        NUGET_SOURCE: ${{ secretes.NUGET_SOURCE }}
+      run: dotnet nuget push Mongo.Migration.${VERSION}.nupkg --source ${NUGET_SOURCE} --api-key ${NUGET_API_KEY}

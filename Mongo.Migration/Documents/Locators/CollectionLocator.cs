@@ -1,47 +1,38 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 using Mongo.Migration.Documents.Attributes;
+#if NET8_0_OR_GREATER
+using System.Collections.Frozen;
+#else
+using System.Collections.Immutable;
+#endif
 
-namespace Mongo.Migration.Documents.Locators
+namespace Mongo.Migration.Documents.Locators;
+
+public class CollectionLocator : AbstractLocator<CollectionLocationInformation, Type>, ICollectionLocator
 {
-    public class CollectionLocator : AbstractLocator<CollectionLocationInformation, Type>, ICollectionLocator
+    public override CollectionLocationInformation? GetLocateOrNull(Type identifier)
     {
-        public override CollectionLocationInformation? GetLocateOrNull(Type identifier)
+        if (!LocatesDictionary.ContainsKey(identifier))
         {
-            if (!this.LocatesDictionary.ContainsKey(identifier))
-            {
-                return null;
-            }
-
-            this.LocatesDictionary.TryGetValue(identifier, out var value);
-            return value;
+            return null;
         }
 
-        public override void Locate()
-        {
-            var types =
-                from a in AppDomain.CurrentDomain.GetAssemblies()
-                from t in a.GetTypes()
-                let attributes = t.GetCustomAttributes(typeof(CollectionLocation), true)
-                where attributes != null && attributes.Length > 0
-                select new { Type = t, Attributes = attributes.Cast<CollectionLocation>() };
+        LocatesDictionary.TryGetValue(identifier, out var value);
+        return value;
+    }
 
-            var versions = new Dictionary<Type, CollectionLocationInformation>();
+    public override void Locate()
+    {
+        LocatesDictionary = LocateAttributes<CollectionLocationAttribute>()
+#if NET8_0_OR_GREATER
+            .ToFrozenDictionary(pair => pair.Item1, pair => pair.Item2.CollectionInformation);
+#else
+            .ToImmutableDictionary(pair => pair.Item1, pair => pair.Item2.CollectionInformation);
+#endif
 
-            foreach (var type in types)
-            {
-                var version = type.Attributes.First().CollectionInformation;
-                versions.Add(type.Type, version);
-            }
+    }
 
-            this.LocatesDictionary = versions;
-        }
-
-        public IDictionary<Type, CollectionLocationInformation> GetLocatesOrEmpty()
-        {
-            return this.LocatesDictionary;
-        }
+    public IDictionary<Type, CollectionLocationInformation> GetLocatesOrEmpty()
+    {
+        return LocatesDictionary;
     }
 }

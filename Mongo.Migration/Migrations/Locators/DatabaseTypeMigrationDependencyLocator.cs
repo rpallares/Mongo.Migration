@@ -1,35 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-
-using Mongo.Migration.Migrations.Adapters;
+﻿using Microsoft.Extensions.Logging;
 using Mongo.Migration.Migrations.Database;
 
-namespace Mongo.Migration.Migrations.Locators
+namespace Mongo.Migration.Migrations.Locators;
+
+internal class DatabaseTypeMigrationDependencyLocator : TypeMigrationDependencyLocator<IDatabaseMigration>, IDatabaseTypeMigrationDependencyLocator
 {
-    internal class DatabaseTypeMigrationDependencyLocator : TypeMigrationDependencyLocator<IDatabaseMigration>, IDatabaseTypeMigrationDependencyLocator
+    private IDictionary<Type, IReadOnlyCollection<IDatabaseMigration>>? _migrations;
+    public DatabaseTypeMigrationDependencyLocator(ILogger<DatabaseTypeMigrationDependencyLocator> logger, IServiceProvider serviceProvider)
+        : base(logger, serviceProvider) { }
+
+    protected override IDictionary<Type, IReadOnlyCollection<IDatabaseMigration>> Migrations
     {
-        private IDictionary<Type, IReadOnlyCollection<IDatabaseMigration>> _migrations;
-
-        protected override IDictionary<Type, IReadOnlyCollection<IDatabaseMigration>> Migrations
+        get
         {
-            get
+            if (_migrations == null)
             {
-                if (this._migrations == null)
-                {
-                    this.Locate();
-                }
-
-                return this._migrations;
+                Locate();
             }
-            set
-            {
-                this._migrations = value;
-            }
-        }
 
-        public DatabaseTypeMigrationDependencyLocator(IContainerProvider containerProvider)
-            : base(containerProvider)
-        {
+            return _migrations!;
         }
+        set => _migrations = value;
     }
+
+    
 }

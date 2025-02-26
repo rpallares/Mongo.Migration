@@ -1,42 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
+﻿#if NET8_0_OR_GREATER
+using System.Collections.Frozen;
+#else
+using System.Collections.Immutable;
+#endif
 using Mongo.Migration.Documents.Attributes;
 
-namespace Mongo.Migration.Documents.Locators
+namespace Mongo.Migration.Documents.Locators;
+
+internal class RuntimeVersionLocator : AbstractLocator<DocumentVersion, Type>, IRuntimeVersionLocator
 {
-    internal class RuntimeVersionLocator : AbstractLocator<DocumentVersion, Type>, IRuntimeVersionLocator
+#if NET8_0_OR_GREATER
+    private readonly FrozenDictionary<Type, DocumentVersion> _codeDefinedDictionary;
+#else
+    private readonly ImmutableDictionary<Type, DocumentVersion> _codeDefinedDictionary;
+#endif
+
+    internal RuntimeVersionLocator(IEnumerable<KeyValuePair<Type, DocumentVersion>> alreadyDefinedRuntimeVersions)
     {
-        public override DocumentVersion? GetLocateOrNull(Type identifier)
-        {
-            if (!this.LocatesDictionary.ContainsKey(identifier))
-            {
-                return null;
-            }
+#if NET8_0_OR_GREATER
+        _codeDefinedDictionary = alreadyDefinedRuntimeVersions.ToFrozenDictionary();
+#else
+        _codeDefinedDictionary = alreadyDefinedRuntimeVersions.ToImmutableDictionary();
+#endif
+    }
 
-            this.LocatesDictionary.TryGetValue(identifier, out var value);
-            return value;
+    public override DocumentVersion? GetLocateOrNull(Type identifier)
+    {
+        if (_codeDefinedDictionary.TryGetValue(identifier, out DocumentVersion version))
+        {
+            return version;
         }
 
-        public override void Locate()
+        if (LocatesDictionary.TryGetValue(identifier, out version))
         {
-            var types =
-                from a in AppDomain.CurrentDomain.GetAssemblies()
-                from t in a.GetTypes()
-                let attributes = t.GetCustomAttributes(typeof(RuntimeVersion), true)
-                where attributes != null && attributes.Length > 0
-                select new { Type = t, Attributes = attributes.Cast<RuntimeVersion>() };
-
-            var versions = new Dictionary<Type, DocumentVersion>();
-
-            foreach (var type in types)
-            {
-                var version = type.Attributes.First().Version;
-                versions.Add(type.Type, version);
-            }
-
-            this.LocatesDictionary = versions;
+            return version;
         }
+
+        return null;
+    }
+
+    public override void Locate()
+    {
+        LocatesDictionary = LocateAttributes<RuntimeVersionAttribute>()
+#if NET8_0_OR_GREATER
+            .ToFrozenDictionary(pair => pair.Item1, pair => pair.Item2.Version);
+#else
+            .ToImmutableDictionary(pair => pair.Item1, pair => pair.Item2.Version);
+#endif
     }
 }

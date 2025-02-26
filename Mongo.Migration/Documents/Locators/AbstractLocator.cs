@@ -1,30 +1,38 @@
-using System.Collections.Generic;
+using System.Reflection;
 
-namespace Mongo.Migration.Documents.Locators
+namespace Mongo.Migration.Documents.Locators;
+
+public abstract class AbstractLocator<TReturnType, TTypeIdentifier> : ILocator<TReturnType, TTypeIdentifier>
+    where TReturnType : struct
+    where TTypeIdentifier : class
 {
-    public abstract class AbstractLocator<TReturnType, TTypeIdentifier> : ILocator<TReturnType, TTypeIdentifier>
-        where TReturnType : struct
-        where TTypeIdentifier : class
+    private IDictionary<TTypeIdentifier, TReturnType>? _locatesDictionary;
+
+    protected IDictionary<TTypeIdentifier, TReturnType> LocatesDictionary
     {
-        private IDictionary<TTypeIdentifier, TReturnType> _locatesDictionary;
-
-        protected IDictionary<TTypeIdentifier, TReturnType> LocatesDictionary
+        get
         {
-            get
+            if (_locatesDictionary == null)
             {
-                if (this._locatesDictionary == null)
-                {
-                    this.Locate();
-                }
-
-                return this._locatesDictionary;
+                Locate();
             }
 
-            set => this._locatesDictionary = value;
+            return _locatesDictionary!;
         }
 
-        public abstract TReturnType? GetLocateOrNull(TTypeIdentifier identifier);
+        set => _locatesDictionary = value;
+    }
 
-        public abstract void Locate();
+    public abstract TReturnType? GetLocateOrNull(TTypeIdentifier identifier);
+
+    public abstract void Locate();
+
+    protected IEnumerable<(Type, TAttribute)> LocateAttributes<TAttribute>() where TAttribute : Attribute
+    {
+        return AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(a => a.GetExportedTypes())
+            .Select(t => (t, t.GetCustomAttributes<TAttribute>(true).FirstOrDefault()))
+            .Where(tuple => tuple.Item2 is not null)
+            .Cast<(Type, TAttribute)>();
     }
 }
