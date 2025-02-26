@@ -1,11 +1,9 @@
-[![.NET](https://github.com/SRoddis/Mongo.Migration/actions/workflows/dotnet.yml/badge.svg)](https://github.com/SRoddis/Mongo.Migration/actions/workflows/dotnet.yml)
-[![Coverage Status](https://coveralls.io/repos/github/SRoddis/Mongo.Migration/badge.svg)](https://coveralls.io/github/SRoddis/Mongo.Migration)
-[![NuGet](https://img.shields.io/nuget/dt/Mongo.Migration.svg)](https://www.nuget.org/packages/Mongo.Migration/)
-[![NuGet](https://img.shields.io/nuget/v/Mongo.Migration.svg)](https://www.nuget.org/packages/Mongo.Migration/)
-![GitHub last commit](https://img.shields.io/github/last-commit/sroddis/Mongo.Migration.svg)
+![GitHub License](https://img.shields.io/github/license/rpallares/Mongo.Migration)
+![NuGet Downloads](https://img.shields.io/nuget/dt/Mongo.Migration)
+![NuGet](https://img.shields.io/nuget/v/Mongo.Migration)
+![GitHub last commit](https://img.shields.io/github/last-commit/rpallares/Mongo.Migration)
 
 # Mongo.Migration
-
 
 ![](https://media.giphy.com/media/10tLOFXDFDjgQM/giphy.gif)
 
@@ -243,7 +241,7 @@ This could be not 100% exhaustive but v5.0.0 did a lot of changes comparing to o
 Consider also there was a lot of changes between the last 3.1.4 officially published version and the source code.
 
 ### Updates
-- .Net version update (.net6_0, .net8_0, .net9_0)
+- .Net version update (.net7_0, .net8_0, .net9_0)
 - MongDB.Driver@3.0.0+
 - Dependency updates
 - Remove Mongo2Go in favor of Testcontainers
@@ -268,7 +266,7 @@ Consider also there was a lot of changes between the last 3.1.4 officially publi
 # Next Feature/Todo
 
 1. Create startup setting to limit database migrations ran at startup on fresh database
-2. Remove .net6_0 support
+2. Remove .net7_0 support
 
 # License
 
