@@ -15,7 +15,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<PackageId>Mongo.Migration</PackageId>
+		<PackageId>Mongo.RuntimeMigration</PackageId>
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/rpallares/Mongo.Migration</RepositoryUrl>
 		<Authors>SRoddis;delepster;pleveille333;etiennelepagel;rpallares</Authors>
