@@ -24,7 +24,7 @@ jobs:
     - name: Build
       run: dotnet build -c Release /p:Version=${VERSION}
     - name: Test
-      run: dotnet test -c Release /p:Version=${VERSION} --no-build
+      run: dotnet test -c Release /p:Version=${VERSION} --no-build --framework net9.0
     - name: Pack
       run: dotnet pack -c Release /p:Version=${VERSION} --no-build --output .
     - name: Push
