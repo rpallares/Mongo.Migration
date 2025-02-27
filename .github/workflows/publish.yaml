@@ -31,5 +31,5 @@ jobs:
       with:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
       env:
-        NUGET_SOURCE: ${{ secretes.NUGET_SOURCE }}
+        NUGET_SOURCE: ${{ secrets.NUGET_SOURCE }}
       run: dotnet nuget push Mongo.Migration.${VERSION}.nupkg --source ${NUGET_SOURCE} --api-key ${NUGET_API_KEY}
