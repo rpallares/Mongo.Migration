@@ -12,7 +12,6 @@ env:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    environment: production
     permissions:
       packages: write
       contents: read
@@ -28,7 +27,4 @@ jobs:
     - name: Pack
       run: dotnet pack -c Release /p:Version=${VERSION} --no-build --output .
     - name: Push
-      env:
-        NUGET_SOURCE: ${{ secrets.NUGET_SOURCE }}
-        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-      run: dotnet nuget push Mongo.Migration.${VERSION}.nupkg --source ${NUGET_SOURCE} --api-key ${NUGET_API_KEY}
+      run: dotnet nuget push Mongo.Migration.${VERSION}.nupkg --source $NUGET_SOURCE --api-key "${{ secrets.NUGET_API_KEY }}"
