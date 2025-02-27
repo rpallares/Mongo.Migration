@@ -27,4 +27,7 @@ jobs:
     - name: Pack
       run: dotnet pack -c Release /p:Version=${VERSION} --no-build --output .
     - name: Push
-      run: dotnet nuget push Mongo.Migration.${VERSION}.nupkg --source $NUGET_SOURCE --api-key "${{ secrets.NUGET_API_KEY }}"
+      env:
+        NUGET_SOURCE: ${{ vars.NUGET_SOURCE }}
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+      run: dotnet nuget push Mongo.Migration.${VERSION}.nupkg --source $NUGET_SOURCE --api-key "$NUGET_API_KEY"
