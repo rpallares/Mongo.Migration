@@ -2,10 +2,11 @@ name: Publish
 
 on:
   push:
-    branches:
-      - master
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+(-preview[0-9]+)?"
+
+env:
+  DOTNET_NOLOGO: true
 
 jobs:
   publish:
@@ -17,8 +18,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.0.x
     - name: Set VERSION variable from tag
       run: echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
     - name: Build
