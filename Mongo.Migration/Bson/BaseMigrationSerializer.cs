@@ -5,9 +5,10 @@ using MongoDB.Bson.Serialization.Serializers;
 using Mongo.Migration.Migrations.Document;
 using Mongo.Migration.Services;
 using Mongo.Migration.Documents;
+using MongoDB.Bson.Serialization.Conventions;
 
 namespace Mongo.Migration.Bson;
-internal abstract class BaseMigrationSerializer<TDocument> : SerializerBase<TDocument>
+internal abstract class BaseMigrationSerializer<TDocument> : SerializerBase<TDocument>, IBsonIdProvider, IBsonDocumentSerializer, IBsonPolymorphicSerializer, IHasDiscriminatorConvention
 {
     private static readonly Type s_tDocumentType = typeof(TDocument);
 
@@ -49,4 +50,19 @@ internal abstract class BaseMigrationSerializer<TDocument> : SerializerBase<TDoc
         var migratedContext = BsonDeserializationContext.CreateRoot(new BsonDocumentReader(document));
         return InnerSerializer.Deserialize(migratedContext, args);
     }
+
+    public bool TryGetMemberSerializationInfo(string memberName, out BsonSerializationInfo serializationInfo)
+         => InnerSerializer.TryGetMemberSerializationInfo(memberName, out serializationInfo);
+
+    public bool GetDocumentId(object document, out object id, out Type idNominalType, out IIdGenerator idGenerator)
+         => InnerSerializer.GetDocumentId(document, out id, out idNominalType, out idGenerator);
+
+    public void SetDocumentId(object document, object id)
+        => InnerSerializer.SetDocumentId(document, id);
+
+    public bool IsDiscriminatorCompatibleWithObjectSerializer
+        => InnerSerializer.IsDiscriminatorCompatibleWithObjectSerializer;
+
+    public IDiscriminatorConvention DiscriminatorConvention
+         => InnerSerializer.DiscriminatorConvention;
 }
