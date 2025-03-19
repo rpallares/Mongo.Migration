@@ -1,7 +1,9 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.ObjectModel;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Mongo.Migration.Documents;
+using Mongo.Migration.Extensions;
 
 namespace Mongo.Migration.Migrations.Locators;
 
@@ -10,36 +12,21 @@ public abstract class MigrationLocator<TMigrationType> : IMigrationLocator<TMigr
 {
     private readonly ILogger<MigrationLocator<TMigrationType>> _logger;
 
-    private readonly List<Assembly> _assemblies;
+    private readonly IServiceProvider _serviceProvider;
 
-    private IDictionary<Type, IReadOnlyCollection<TMigrationType>>? _migrations;
+    private readonly Lazy<IDictionary<Type, ReadOnlyCollection<TMigrationType>>> _lazyMigrations;
 
-    protected MigrationLocator(ILogger<MigrationLocator<TMigrationType>> logger)
+    protected MigrationLocator(ILogger<MigrationLocator<TMigrationType>> logger, IServiceProvider serviceProvider)
     {
         _logger = logger;
-        _assemblies = GetAssemblies();
+        _serviceProvider = serviceProvider;
+        _lazyMigrations = new Lazy<IDictionary<Type, ReadOnlyCollection<TMigrationType>>>(
+            LoadMigrations,
+            LazyThreadSafetyMode.PublicationOnly);
     }
 
-    protected IEnumerable<Assembly> Assemblies => _assemblies;
-
-    protected virtual IDictionary<Type, IReadOnlyCollection<TMigrationType>> Migrations
-    {
-        get
-        {
-            if (_migrations is null)
-            {
-                Locate();
-            }
-
-            if (_migrations is null || _migrations.Count <= 0)
-            {
-                _logger.LogWarning("No migration found");
-            }
-
-            return _migrations ?? ImmutableDictionary<Type, IReadOnlyCollection<TMigrationType>>.Empty;
-        }
-        set => _migrations = value;
-    }
+    protected virtual IDictionary<Type, ReadOnlyCollection<TMigrationType>> Migrations
+        => _lazyMigrations.Value;
 
     public IReadOnlyCollection<TMigrationType> GetMigrations(Type type)
     {
@@ -73,7 +60,32 @@ public abstract class MigrationLocator<TMigrationType> : IMigrationLocator<TMigr
             : DocumentVersion.Default;
     }
 
-    public abstract void Locate();
+    public void Initialize()
+    {
+        if (!_lazyMigrations.IsValueCreated)
+        {
+            var migrations = _lazyMigrations.Value;
+            _logger.LogDebug("Migration locator initialized and loaded {Count} migrations", migrations.Count);
+        }
+    }
+
+    private IDictionary<Type, ReadOnlyCollection<TMigrationType>> LoadMigrations()
+    {
+        Type migrationType = typeof(TMigrationType);
+
+        List<Assembly> assemblies = GetAssemblies();
+
+        var migrationTypes = assemblies
+            .SelectMany(a => a.GetExportedTypes())
+            .Where(type => !type.IsAbstract && migrationType.IsAssignableFrom(type))
+            .DistinctBy(t => t.AssemblyQualifiedName)
+            .Select(GetMigrationInstance)
+            .ToMigrationDictionary();
+
+        _logger.LogDebug("{Count} {MigrationType} migrations found", migrationTypes.Count, migrationType.Name);
+
+        return migrationTypes;
+    }
 
     private static List<Assembly> GetAssemblies()
     {
@@ -91,5 +103,25 @@ public abstract class MigrationLocator<TMigrationType> : IMigrationLocator<TMigr
         assemblies.AddRange(migrationAssemblies);
 
         return assemblies;
+    }
+
+    private TMigrationType GetMigrationInstance(Type type)
+    {
+        ConstructorInfo[] constructors = type.GetConstructors();
+
+        if (constructors.Length > 0)
+        {
+            var args = constructors
+                .First()
+                .GetParameters()
+                .Select(parameterInfo => _serviceProvider.GetRequiredService(parameterInfo.ParameterType))
+                .ToArray();
+
+            return Activator.CreateInstance(type, args) as TMigrationType
+                   ?? throw new InvalidOperationException($"Cannot create {type} migration");
+        }
+
+        return Activator.CreateInstance(type) as TMigrationType
+               ?? throw new InvalidOperationException($"Cannot create {type} migration");
     }
 }

@@ -6,6 +6,7 @@ using Mongo.Migration.Documents;
 using Mongo.Migration.Documents.Serializers;
 using Mongo.Migration.Migrations.Database;
 using Mongo.Migration.Migrations.Document;
+using Mongo.Migration.Migrations.Locators;
 using Mongo.Migration.Startup;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
@@ -40,6 +41,9 @@ internal class MigrationService : IMigrationService
         {
             MigrationBsonSerializerProvider migrationSerializerProvider = _provider.GetRequiredService<MigrationBsonSerializerProvider>();
             BsonSerializer.RegisterSerializationProvider(migrationSerializerProvider);
+
+            var documentMigrationLocator = _provider.GetRequiredService<IMigrationLocator<IDocumentMigration>>();
+            documentMigrationLocator.Initialize();
         }
     }
 

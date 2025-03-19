@@ -1,4 +1,6 @@
-﻿using Mongo.Migration.Documents;
+﻿using System.Collections.Frozen;
+using System.Collections.ObjectModel;
+using Mongo.Migration.Documents;
 using Mongo.Migration.Exceptions;
 using Mongo.Migration.Migrations;
 
@@ -23,29 +25,16 @@ internal static class EnumerableExtensions
         }
     }
 
-    internal static IDictionary<Type, IReadOnlyCollection<TMigrationType>> ToMigrationDictionary<TMigrationType>(
+    internal static IDictionary<Type, ReadOnlyCollection<TMigrationType>> ToMigrationDictionary<TMigrationType>(
         this IEnumerable<TMigrationType> migrations)
         where TMigrationType : IMigration
     {
-        var dictionary = new Dictionary<Type, IReadOnlyCollection<TMigrationType>>();
-        var list = migrations.ToList();
-        var types = (from m in list select m.Type).Distinct();
-
-        foreach (var type in types)
-        {
-            if (dictionary.ContainsKey(type))
-            {
-                continue;
-            }
-
-            var uniqueMigrations = list
-                .Where(m => m.Type == type)
-                .CheckForDuplicates()
-                .OrderBy(m => m.Version)
-                .ToList();
-            dictionary.Add(type, uniqueMigrations);
-        }
-
-        return dictionary;
+        return migrations
+            .GroupBy(m => m.Type)
+            .ToFrozenDictionary(
+                g => g.Key,
+                g => g
+                    .CheckForDuplicates()
+                    .OrderBy(m => m.Version).ToList().AsReadOnly());
     }
 }
