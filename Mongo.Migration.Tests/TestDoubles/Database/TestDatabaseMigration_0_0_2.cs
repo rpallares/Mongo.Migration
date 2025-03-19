@@ -3,12 +3,9 @@ using MongoDB.Driver;
 
 namespace Mongo.Migration.Tests.TestDoubles.Database;
 
-internal class TestDatabaseMigration002 : DatabaseMigration
+public class TestDatabaseMigration002 : DatabaseMigration
 {
-    public TestDatabaseMigration002()
-        : base("0.0.2")
-    {
-    }
+    public TestDatabaseMigration002() : base("0.0.2") { }
 
     public override Task UpAsync(IMongoDatabase db, CancellationToken cancellationToken) => Task.CompletedTask;
 
