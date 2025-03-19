@@ -13,5 +13,5 @@ public interface IMigrationLocator<out TMigrationType>
 
     DocumentVersion GetLatestVersion(Type type);
 
-    void Locate();
+    void Initialize();
 }

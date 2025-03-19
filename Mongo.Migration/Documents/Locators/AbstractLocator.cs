@@ -1,38 +1,43 @@
+using System.Collections.Frozen;
 using System.Reflection;
 
 namespace Mongo.Migration.Documents.Locators;
 
-public abstract class AbstractLocator<TReturnType, TTypeIdentifier> : ILocator<TReturnType, TTypeIdentifier>
+public abstract class AbstractLocator<TReturnType, TAttributeType> : ILocator<TReturnType, Type>
     where TReturnType : struct
-    where TTypeIdentifier : class
+    where TAttributeType : Attribute
 {
-    private IDictionary<TTypeIdentifier, TReturnType>? _locatesDictionary;
+    private readonly Lazy<IDictionary<Type, TReturnType>> _lazyLocateDictionary;
 
-    protected IDictionary<TTypeIdentifier, TReturnType> LocatesDictionary
+    protected AbstractLocator()
     {
-        get
-        {
-            if (_locatesDictionary == null)
-            {
-                Locate();
-            }
-
-            return _locatesDictionary!;
-        }
-
-        set => _locatesDictionary = value;
+        _lazyLocateDictionary = new Lazy<IDictionary<Type, TReturnType>>(
+            LoadLocateDictionary,
+            LazyThreadSafetyMode.PublicationOnly);
     }
 
-    public abstract TReturnType? GetLocateOrNull(TTypeIdentifier identifier);
+    protected abstract TReturnType GetAttributeValue(TAttributeType attribute);
 
-    public abstract void Locate();
+    protected IDictionary<Type, TReturnType> LocatesDictionary => _lazyLocateDictionary.Value;
 
-    protected IEnumerable<(Type, TAttribute)> LocateAttributes<TAttribute>() where TAttribute : Attribute
+    public virtual TReturnType? GetLocateOrNull(Type identifier)
+    {
+        if (LocatesDictionary.TryGetValue(identifier, out TReturnType returnType))
+        {
+            return returnType;
+        }
+
+        return null;
+    }
+
+    private FrozenDictionary<Type, TReturnType> LoadLocateDictionary()
     {
         return AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(a => a.GetExportedTypes())
-            .Select(t => (t, t.GetCustomAttributes<TAttribute>(true).FirstOrDefault()))
-            .Where(tuple => tuple.Item2 is not null)
-            .Cast<(Type, TAttribute)>();
+            .Select(t => (t, t.GetCustomAttribute<TAttributeType>()))
+            .Where(t => t.Item2 is not null)
+            .ToFrozenDictionary(
+                pair => pair.t,
+                pair => GetAttributeValue(pair.Item2!));
     }
 }
