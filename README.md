@@ -1,16 +1,16 @@
 ![GitHub License](https://img.shields.io/github/license/rpallares/Mongo.Migration)
-![NuGet Downloads](https://img.shields.io/nuget/dt/Mongo.Migration)
-![NuGet](https://img.shields.io/nuget/v/Mongo.Migration)
+![NuGet Downloads](https://img.shields.io/nuget/dt/Mongo.RuntimeMigration)
+![NuGet](https://img.shields.io/nuget/v/Mongo.RuntimeMigration)
 ![GitHub last commit](https://img.shields.io/github/last-commit/rpallares/Mongo.Migration)
 
-# Mongo.Migration
+# Mongo.RuntimeMigration
 
 ![](https://media.giphy.com/media/10tLOFXDFDjgQM/giphy.gif)
 
-Mongo.Migration is designed for the [MongoDB C# Driver](https://github.com/mongodb/mongo-csharp-driver) to migrate your documents easily and on-the-fly.
+Mongo.RuntimeMigration is designed for the [MongoDB C# Driver](https://github.com/mongodb/mongo-csharp-driver) to migrate your documents easily and on-the-fly.
 No more downtime for schema-migrations. Just write small and simple `migrations`.
 
-Version 5.0.0 of Mongo.Migration is a code modernization and simplification release. It also has a strong focus on performance.  
+Version 5.0.0 of Mongo.RuntimeMigration is a code modernization and simplification release. It also has a strong focus on performance.  
 
 The library is still based on the official [MongoDB.Driver](https://www.mongodb.com/docs/drivers/csharp/) (3.0.0+) and supports the following 3 types of migration:
 - **Runtime document migration:**    
@@ -28,11 +28,11 @@ A robust application will probably use two kind of migrations.
 
 # Installation
 
-Install via nuget https://www.nuget.org/packages/Mongo.Migration
+Install via nuget https://www.nuget.org/packages/Mongo.RuntimeMigration
 **Note:** The package isn't maintained since a while, so for now it's preferable to compile it locally
 
 ```shell
-dotnet add package Mongo.Migration
+dotnet add package Mongo.RuntimeMigration
 ```
 # Register migration services
 
@@ -114,7 +114,7 @@ You can still execute them at startup to migrate your database but this **is not
     }
     ```
 3`(Optional)` If you choose to put your migrations into an extra project, 
-add the suffix `".MongoMigrations"` to the name and make sure it is referenced in the main project. By convention Mongo.Migration collects all .dlls named like that in your bin folder.
+add the suffix `".MongoMigrations"` to the name and make sure it is referenced in the main project. By convention Mongo.RuntimeMigration collects all .dlls named like that in your bin folder.
     
 Compile, run and enjoy!
 
@@ -180,7 +180,7 @@ public class Car : IDocument { }
 ## CollectionLocation
 
 Add `CollectionLocation` attribute if you want to migrate your collections at startup with document migration.  
-This attribute tells Mongo.Migration where to find your Collections.
+This attribute tells Mongo.RuntimeMigration where to find your Collections.
 
 ```csharp
 [CollectionLocation("Car")]
@@ -202,11 +202,11 @@ Deploy the migrations in a separate artifact. Otherwise, you lose the ability to
 # Performance
 
 The performance is measured on every push to the repository with a small performance-test.  
-It measures the time MongoDB needs to insert and read `n documents` (5000) with and without Mongo.Migration. The difference is asserted and should be not higher than a given tolerance (150ms).
+It measures the time MongoDB needs to insert and read `n documents` (5000) with and without Mongo.RuntimeMigration. The difference is asserted and should be not higher than a given tolerance (150ms).
 
 Example output of the automated test:
 ```bash
-MongoDB: 21ms, Mongo.Migration: 210ms, Diff: 189ms (Tolerance: 600ms), Documents: 5000, Migrations per Document: 2
+MongoDB: 21ms, Mongo.RuntimeMigration: 210ms, Diff: 189ms (Tolerance: 600ms), Documents: 5000, Migrations per Document: 2
 ```
 
 After bigger changes the code is analyzed with profiling tools to check for performance or memory problems.
@@ -240,7 +240,7 @@ This could be not 100% exhaustive but v5.0.0 did a lot of changes comparing to o
 Consider also there was a lot of changes between the last 3.1.4 officially published version and the source code.
 
 ### Updates
-- .Net version update (.net7_0, .net8_0, .net9_0)
+- .Net version update (.net8_0, .net9_0)
 - MongDB.Driver@3.0.0+
 - Dependency updates
 - Remove Mongo2Go in favor of Testcontainers
@@ -268,5 +268,8 @@ Consider also there was a lot of changes between the last 3.1.4 officially publi
 2. Remove .net7_0 support
 
 # License
+Mongo.RuntimeMigration is licensed under [MIT](http://www.opensource.org/licenses/mit-license.php "Read more about the MIT license form"). Refer to license.txt for more information.
 
-Mongo.Migration is licensed under [MIT](http://www.opensource.org/licenses/mit-license.php "Read more about the MIT license form"). Refer to license.txt for more information.
+It has been forked from [SRoddis/Mongo.Migration](https://github.com/SRoddis/Mongo.Migration) that is no longer maintained.  
+That's why the nuget name is `Mongo.RuntimeMigration` whereas namespace is still `Mongo.Migration`.  
+Thanks to SRoddis for that library.
