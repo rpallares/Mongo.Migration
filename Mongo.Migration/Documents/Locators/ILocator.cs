@@ -5,6 +5,4 @@ public interface ILocator<TReturnType, in TTypeIdentifier>
     where TTypeIdentifier : class
 {
     TReturnType? GetLocateOrNull(TTypeIdentifier identifier);
-
-    void Locate();
 }
