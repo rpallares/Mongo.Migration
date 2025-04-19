@@ -17,7 +17,7 @@
 		<PackageId>Mongo.RuntimeMigration</PackageId>
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/rpallares/Mongo.Migration</RepositoryUrl>
-		<Authors>SRoddis;delepster;pleveille333;etiennelepagel;rpallares</Authors>
+		<Authors>rpallares</Authors>
 		<Description>Mongo.Migration is designed for the MongoDB.Driver to migrate documents easily and on-the-fly</Description>
 		<PackageTags>mongo, library, migration</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
